@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html data-ng-app="app">
+<head>
+    <title>UA-GB</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <link rel="manifest" href="/manifest.json">
+    <link href="lib/css/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="lib/css/angular-ui-notification.min.css">
+    <link rel="stylesheet" href="lib/css/animate.css" type="text/css" />
+    <link rel="stylesheet" href="lib/css/font-awesome.css" type="text/css" />
+    <link rel="stylesheet" href="lib/css/simple-line-icons.css" type="text/css" />
+    <link rel="stylesheet" href="assets/css/font.css" type="text/css" />
+    <link rel="stylesheet" href="assets/css/app.css" type="text/css" />
+    <script type="text/javascript" src ="assets/js/no_ad.js"></script>
+</head>
+<body ng-controller="AppCtrl">
+
+<div class="app" id="app" ng-class="{
+    'app-header-fixed':app.settings.headerFixed,
+    'app-aside-hide':app.settings.asideHide,
+    'app-aside-fixed':app.settings.asideFixed,
+    'app-aside-folded':app.settings.asideFolded,
+    'app-aside-dock':app.settings.asideDock,
+    'container':app.settings.container}" ui-view></div>
+
+<!--
+<div class="container">
+    <div ng-view></div>
+</div>
+ -->
+
+<!-- jQuery -->
+<script src="lib/jquery.js"></script>
+
+
+<!-- Angular -->
+<script type="text/javascript" src="lib/angular.js"></script>
+
+<!--<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular-route.js"></script>-->
+
+<!-- bootstrap -->
+<script type="text/javascript" src ="lib/ui-bootstrap-tpls.js"></script>
+<script type="text/javascript" src ="lib/angular-ui-router.js"></script>
+<script type="text/javascript" src="lib/angular-ui-notification.min.js"></script>
+<script type="text/javascript" src ="lib/smart-table.js"></script>
+<script type="text/javascript" src ="lib/angular-dreamfactory.js"></script>
+<script type="text/javascript" src ="assets/js/app.js"></script>
+<script type="text/javascript" src ="assets/js/config.router.js"></script>
+<script type="text/javascript" src ="assets/js/main.js"></script>
+<script type="text/javascript" src ="assets/js/accessCtrl.js"></script>
+<script type="text/javascript" src ="assets/js/clientCtrl.js" charset="utf-8"></script>
+<script type="text/javascript" src ="assets/js/regionCtrl.js" charset="utf-8"></script>
+<script type="text/javascript" src ="assets/js/orderCtrl.js" charset="utf-8"></script>
+<script src="assets/js/services/storage.js"></script>
+<script src="assets/js/services/notify.js"></script>
+<script src="assets/js/services/auth.js"></script>
+<script src="assets/js/directives/bag-manager.js"></script>
+<script src="assets/js/directives/good-manager.js"></script>
+<script src="assets/js/directives/setnganimate.js"></script>
+<script src="assets/js/directives/ui-focus.js"></script>
+<!--<script src="assets/js/directives/ui-fullscreen.js"></script>-->
+<script src="assets/js/directives/ui-jq.js"></script>
+<script src="assets/js/directives/ui-module.js"></script>
+<script src="assets/js/directives/ui-nav.js"></script>
+<script src="assets/js/directives/ui-scroll.js"></script>
+<script src="assets/js/directives/ui-toggleclass.js"></script>
+
+<div id="last"></div>
+</body>
+</html>
