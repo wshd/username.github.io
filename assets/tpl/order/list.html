@@ -1,0 +1,131 @@
+<div class="bg-light lter b-b wrapper-md hidden-print" ng-init="app.settings.asideHide = false">
+    <span class="pull-right h3 text-info-dker">{{app.selDate}}</span>
+    <h1 class="m-n font-thin h3"><i class="icon-present fa-fw"></i> &nbsp; Замовлення</h1>
+</div>
+<div class="wrapper-md">
+    <div class="row">
+        <div class="m-sm">
+            <div class="panel panel-default">
+                <div class="panel-heading bg-info dk wrapper-sm">
+                    <div class="m-sm">
+                        <span class="pull-right h3 text-info-dker visible-print">{{app.selDate}}</span>
+                        <div class="btn-group btn-group-sm pull-right hidden-print">
+                            <button type="button" class="btn btn-success" ng-click="add()"><i class="glyphicon glyphicon-plus"></i></button>
+                            <button type="button" class="btn btn-dark" ng-click="print()"><i class="glyphicon glyphicon-print"></i></button>
+                            <!--<button type="button" class="btn btn-primary" ng-click="fix()"><i class="glyphicon glyphicon-exclamation-sign"></i></button>-->
+                        </div>
+                        <span class="h3 text-white">{{ (app.selRegion || {}).name || "Всі" }}</span>
+                        <small class="text-muted text-white block">{{regionOrders}} | {{regionWeight}} кг</small>
+                    </div>
+                </div>
+                <div class="hidden-print" ng-show="filteredOrders.length > 0 && !isLoading">
+                    <table st-table="displayOrders" st-safe-src="filteredOrders" class="table table-condensed b-light">
+                        <thead class="bg-info text-white">
+                        <tr>
+                            <th>#</th>
+                            <th class="hidden-xs hidden-sm"><i class="icon-home fa-fw"></i></th>
+                            <th ng-hide="(app.selRegion || {}).id"><i class="icon-direction fa-fw"></i></th>
+                            <th><i class="icon-user fa-fw"></i></th>
+                            <th class="hidden-xs hidden-sm"><i class="icon-call-end fa-fw"></i></th>
+                            <th><i class="icon-bag fa-fw"></i></th>
+                            <th class="hidden-xs hidden-sm"><i class="icon-speedometer fa-fw"></i></th>
+                            <th class="hidden-xs hidden-sm"><i class="icon-doc fa-fw"></i></th>
+                            <th>&nbsp;</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="order in displayOrders">
+                            <td>{{order.number}}</td>
+                            <td class="hidden-xs hidden-sm">{{order.address}}</td>
+                            <td ng-hide="(app.selRegion || {}).id">{{order.region}}</td>
+                            <td>
+                                {{order.client_name}}
+                                <div class="visible-xs-block visible-sm-block">{{order.client_phone}}</div>
+                                <div class="visible-xs-block visible-sm-block visible-sm-block">{{order.address}}</div>
+                            </td>
+                            <td class="hidden-xs hidden-sm">{{order.client_phone}}</td>
+                            <td class="bags">
+                                <div class="visible-xs-block visible-sm-block text-dark-dk">{{order.comment}}</div>
+                                <div ng-show="order._bags.length > 0">
+                                    <span class="l-h-2x" ng-repeat-start="bag in order._bags track by $index">
+                                        {{$index > 0 ? " + " : ""}}
+                                        <b class="label label-lg bg-black text-white">{{bag}}</strong></b>
+                                    </span> <span ng-repeat-end></span>
+                                </div>
+                                <div ng-show="order._goods.length > 0">
+                                    <span class="label label-lg bg-info dker text-white m-r-sm" ng-repeat-start="good in order._goods track by $index">
+                                        {{good.type}}
+                                        <b class="badge up right bg-danger">{{good.price}}</b>
+                                    </span> <span ng-repeat-end></span>
+                                </div>
+                            </td>
+                            <td class="hidden-xs hidden-sm">{{order.weight}}</td>
+                            <td class="hidden-xs hidden-sm">{{order.comment}}</td>
+                            <td class="commands">
+                                <div class="btn-group btn-group-nowrap" role="group">
+                                    <button href ng-click="edit(order)" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-pencil"></i></button>
+                                    <button ng-click="delete(order)" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-trash"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="9" class="text-center">
+                                <div st-pagination="" st-items-by-page="app.settings.itemsPerPage" st-displayed-pages="7"></div>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="table-bordered visible-print" ng-show="filteredOrders.length > 0">
+                    <table class="table table-condensed b-t b-dark">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Адреса</th>
+                            <th ng-hide="(app.selRegion || {}).id">Регіон</th>
+                            <th>П.І.П.</th>
+                            <th>Телефон</th>
+                            <th>Передачі</th>
+                            <th>Вага</th>
+                            <th style="min-width: 170px;">Коментар</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="order in filteredOrders">
+                            <td>{{order.number}}</td>
+                            <td>{{order.address}}</td>
+                            <td ng-hide="(app.selRegion || {}).id">{{order.region}}</td>
+                            <td>{{order.client_name}}</td>
+                            <td>{{order.client_phone}}</td>
+                            <td class="bags">
+                                <div ng-show="order._bags.length > 0">
+                                    <span class="l-h-2x" ng-repeat-start="bag in order._bags track by $index">
+                                        {{$index > 0 ? " + " : ""}}
+                                        <b class="label label-lg bg-black text-white">{{bag}}</strong></b>
+                                    </span> <span ng-repeat-end></span>
+                                </div>
+                                <div ng-show="order._goods.length > 0">
+                                    <span class="label label-lg m-r-sm bg-info dker text-white" ng-repeat-start="good in order._goods track by $index">
+                                        {{good.type}}
+                                        <b class="badge up right bg-danger">{{good.price}}</b>
+                                    </span> <span ng-repeat-end></span>
+                                </div>
+                            </td>
+                            <td>{{order.weight}}</td>
+                            <td style="min-width: 170px;">{{order.comment}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="wrapper-lg" ng-show="isLoading">
+                    <progressbar class="progress-striped active" value="100" type="info">Завантаження...</progressbar>
+                </div>
+                <footer class="panel-footer text-muted text-shadow text-center bg-light dker wrapper-lg" ng-hide="filteredOrders.length > 0 || isLoading">
+                    <div class="h2">Немає жодного замовлення за {{app.selDate}}</div>
+                </footer>
+            </div>
+        </div>
+    </div>
+</div>

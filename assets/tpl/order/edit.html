@@ -1,0 +1,98 @@
+<script type="text/ng-template" id="customTemplate.html">
+    <a>
+        <strong class="block h4 m-b-none" bind-html-unsafe="match.model.name + ' (' + match.model.phone + ')' | typeaheadHighlight:query"></strong>
+        <span class="text-muted" bind-html-unsafe=" match.model.address | typeaheadHighlight:query"></span>
+    </a>
+</script>
+
+<div class="modal-body wrapper-lg">
+    <form novalidate name="AddNewForm" id="add-new-form">
+        <h3 class="m-t-none m-b font-thin">{{orderToEdit.isNew ? "Нове" : "Змінити"}} замовлення</h3>
+        <div class="row">
+            <div class="col-md-6 b-r">
+                <div class="panel panel-default">
+                    <div class="panel-heading bg-info dk no-border wrapper-sm">
+                        <button class="pull-right btn btn-xs btn-success btn-addon" ng-click="addClient()"><i class="icon-user-follow fa-fw"></i> Новий</button>
+                        <span class="h4 text-white"><i class="icon-user fa-fw"></i> &nbsp; Клієнт</span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label for="address">П.І.П. | Телефон</label>
+                            <div class="input-group">
+                                <span class="input-group-btn" ng-show="orderToEdit.selected_client">
+                                    <button class="btn btn-link" type="button" ng-click="editClient()"><i class="glyphicon glyphicon-pencil"></i></button>
+                                </span>
+                                <input type="text"
+                                       name="selected_client"
+                                       ng-model="orderToEdit.selected_client"
+                                       typeahead="client as client.name + ' (' + client.phone + ')'  for client in clients | filter:{$:$viewValue} | limitTo:12"
+                                       typeahead-template-url="customTemplate.html"
+                                       typeahead-on-select="client_selected($model)"
+                                       typeahead-editable="false"
+                                       class="form-control"
+                                       required>
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-xs-12 col-sm-6">
+                                <label for="address">Адреса</label>
+                                <input class="form-control" type="text" ng-model="orderToEdit.address" required maxlength="255" />
+                            </div>
+                            <div class="form-group col-xs-12 col-sm-6">
+                                <label for="region_id">Регіон</label>
+                                <select class="form-control"  ng-model="orderToEdit.region_id" ng-options="region.id as region.name for region in regions" required></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="row m-b">
+                            <div class="col-xs-4 col-md-6 m-b-sm">
+                                <div class="input-group">
+                                    <span class="input-group-addon hidden-xs">#</span>
+                                    <input class="form-control" type="text" ng-model="orderToEdit.number" placeholder="Номер" required />
+                                </div>
+                            </div>
+                            <div class="col-xs-8 col-md-6 m-b-sm">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" datepicker-popup="yyyy-MM-dd" ng-model="orderToEdit.date" is-open="calendar_opened" min-date="'2000-01-01'" max-date="'2020-12-31'" datepicker-options="dateOptions" ng-required="true" close-text="Закрити" show-button-bar="false" />
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-info" ng-click="open_calendar($event)"><span class="glyphicon glyphicon-time"></span></button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <textarea class="form-control m-t-none" type="text" ng-model="orderToEdit.comment" rows="3" maxlength="255" placeholder="Коментар"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading  bg-info dk no-border wrapper-sm">
+                        <span class="h4 text-white"><i class="icon-present fa-fw"></i> &nbsp; Вантаж</span>
+                    </div>
+                    <div class="panel-body" style="padding-top: 0">
+                        <div class="row bg-light lter b-b wrapper-sm m-b-md">
+                            <strong>Багаж</strong>
+                        </div>
+                        <div class="form-group">
+                            <bag-manager bags="orderToEdit._bags" placeholder="Маса вантажу"></bag-manager>
+                            <small class="help-block text-muted m-b-none">Введіть вагу і натистніть <kbd>Enter</kbd> або <kbd>+</kbd>.</small>
+                        </div>
+                        <div class="row bg-light lter b-b b-t wrapper-sm m-b-md">
+                            <strong>Товари</strong>
+                        </div>
+                        <div class="form-group">
+                            <good-manager goods="orderToEdit._goods" typeph="Тип товару" priceph="Вартість"></good-manager>
+                        </div>
+                    </div>
+                    <div class="panel-footer text-right bg-light dker"><strong>Загальна вага <span class="label label-lg bg-info dker text-white">{{getTotalWeight()}} кг</span></strong></div>
+                </div>
+            </div>
+        </div>
+        <button class="btn btn-info" ng-disabled="AddNewForm.$invalid || isUnchanged()" id="add-new-btn" ng-click="$close(orderToEdit)"><i class="glyphicon glyphicon-floppy-disk"></i>  Зберегти</button>
+        <a href class="btn" ng-click="$dismiss('cancel')">Відмінити</a>
+    </form>
+</div>

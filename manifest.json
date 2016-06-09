@@ -1,0 +1,30 @@
+{
+  "short_name": "UA-GB",
+  "name": "UA-GB",
+  "theme_color": "#1199c4",
+  "background_color": "#16aad8",
+  "icons": [
+    {
+      "src": "logo-32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "logo-64.svg",
+      "sizes": "64x64",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "logo-64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "logo-128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/index.html",
+  "display": "standalone"
+}

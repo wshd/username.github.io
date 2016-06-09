@@ -1,0 +1,16 @@
+<div class="modal-body wrapper-lg">
+    <h3 class="m-t-none m-b font-thin">{{regionToEdit.isNew ? "Додати" : "Редагувати"}} регіон</h3>
+    <form novalidate name="RegionForm" id="add-new-form">
+        <div class="row">
+            <div class="col-xs-12">
+                <input type="hidden" ng-model="regionToEdit.id" value="{{regionToEdit.id}}" />
+                <div class="form-group">
+                    <label>Назва:</label>
+                    <input class="form-control" type="text" ng-model="regionToEdit.name" value="{{regionToEdit.name}}" required autofocus/>
+                </div>
+            </div>
+        </div>
+        <button class="btn btn-info" ng-disabled="RegionForm.$invalid || isUnchanged()" id="add-new-btn" ng-click="$close(regionToEdit)"><i class="glyphicon glyphicon-floppy-disk"></i>  Зберегти</button>
+        <a href class="btn" ng-click="$dismiss('cancel')">Відмінити</a>
+    </form>
+</div>

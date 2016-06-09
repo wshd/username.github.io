@@ -1,0 +1,50 @@
+<div class="bg-light lter b-b wrapper-md" ng-init="app.settings.asideHide = true">
+    <a class="pull-right btn btn-sm btn-success" href ng-click="add()"><i class="glyphicon glyphicon-plus"></i></a>
+    <h1 class="m-n font-thin h3"><i class="icon-directions fa-fw"></i> &nbsp; Регіони</h1>
+</div>
+<div class="wrapper-md">
+    <div class="row">
+        <div class="m-sm">
+            <div class="panel panel-default">
+                <div class="table-responsive" ng-show="regions.length > 0">
+                    <table st-table="displayRegions" st-safe-src="regions" class="table table-condensed b-light">
+                        <thead class="bg-info text-white">
+                        <tr>
+                            <th>НАЗВА</th>
+                            <th><i class="icon-present fa-fw"></i></th>
+                            <th><i class="icon-users fa-fw"></i></th>
+                            <th>&nbsp;</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="region in displayRegions">
+                            <td>{{region.name}}</td>
+                            <td>{{region.orders}}</td>
+                            <td>{{region.clients}}</td>
+                            <td class="commands">
+                                <div class="btn-group btn-group-nowrap" role="group">
+                                    <button href ng-click="edit(region)" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-pencil"></i></button>
+                                    <button ng-click="delete(region)" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-trash"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="5" class="text-center">
+                                <div st-pagination="" st-items-by-page="app.settings.itemsPerPage" st-displayed-pages="7"></div>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="wrapper-lg" ng-show="isLoading">
+                    <progressbar class="progress-striped active" value="100" type="info">Завантаження...</progressbar>
+                </div>
+                <footer class="panel-footer text-muted text-shadow text-center bg-light dker wrapper-lg" ng-hide="regions.length > 0 || isLoading">
+                    <div class="h2">Немає жодного регіону</div>
+                </footer>
+            </div>
+        </div>
+    </div>
+</div>

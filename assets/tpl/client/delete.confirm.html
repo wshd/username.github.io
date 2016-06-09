@@ -1,0 +1,12 @@
+<div class="modal-body wrapper-lg">
+    <h3 class="m-t-none m-b font-thin">Видалити клієнта</h3>
+    <blockquote>
+        <h3 class="text-danger">{{clientToDelete.name}}</h3>
+        <h4 class="text-muted">{{clientToDelete.address}}</h4>
+        <p class="text-muted">{{clientToDelete.phone}}</p>
+    </blockquote>
+    <p>Ви впевнені що хочете видалити цього клієнта?</p>
+    <button class="btn btn-danger" ng-click="$close(clientToDelete)"><i class="glyphicon glyphicon-trash"></i> Видалити
+    </button>
+    <a href class="btn" ng-click="$dismiss('cancel')">Відмінити</a>
+</div>

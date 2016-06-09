@@ -1,0 +1,53 @@
+      <!-- navbar header -->
+      <div class="navbar-header {{app.settings.navbarHeaderColor}}">
+          <button class="pull-right visible-xs" ng-click="$state.go('access.logout')"><i class="icon-power fa-fw"></i></button>
+          <button class="pull-right visible-xs dk" ng-click="$state.go('app.regions')"><i class="icon-directions fa-fw"></i></button>
+          <button class="pull-right visible-xs dk" ng-click="$state.go('app.clients')"><i class="icon-users fa-fw"></i></button>
+          <button class="pull-right visible-xs dk" ng-click="$state.go('app.history')"><i class="icon-calendar fa-fw"></i></button>
+
+        <button class="pull-right visible-xs-aside" ui-toggle-class="off-screen" data-target=".app-aside" ui-scroll-to="app">
+          <i class="glyphicon glyphicon-align-justify"></i>
+        </button>
+        <!-- brand -->
+        <a href ng-click="goHome()" class="navbar-brand text-lt">
+          <i class="fa fa-truck"></i>
+          <span class="hidden-folded hidden-xs m-l-xs">{{app.name}}</span>
+        </a>
+        <!-- / brand -->
+      </div>
+      <!-- / navbar header -->
+
+      <!-- navbar collapse -->
+      <div class="collapse pos-rlt navbar-collapse box-shadow {{app.settings.navbarCollapseColor}}">
+        <!-- link and dropdown -->
+        <ul class="nav navbar-nav hidden-sm">
+        </ul>
+        <!-- / link and dropdown -->
+
+        <!-- nabar right -->
+        <ul class="nav navbar-nav navbar-right">
+            <li>
+                <a ui-sref="app.history" class="no-shadow">
+                    <i class="icon-calendar fa-fw"></i> &nbsp; Історія
+                </a>
+            </li>
+            <li>
+                <a ui-sref="app.clients" class="no-shadow">
+                    <i class="icon-users fa-fw"></i> &nbsp; Клієнти
+                </a>
+            </li>
+            <li>
+                <a ui-sref="app.regions" class="no-shadow">
+                    <i class="icon-directions fa-fw"></i> &nbsp; Регіони
+                </a>
+            </li>
+            <li>
+                <a ui-sref="access.logout" class="no-shadow dk">
+                    <i class="icon-power fa-fw"></i>
+                </a>
+            </li>
+        </ul>
+        <!-- / navbar right -->
+
+      </div>
+      <!-- / navbar collapse -->

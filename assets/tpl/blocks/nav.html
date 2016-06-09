@@ -1,0 +1,14 @@
+<!-- list -->
+<ul class="nav">
+  <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">
+    <span class="h3"><i class="icon-directions fa-fw"></i> &nbsp; Регіони</span>
+  </li>
+    <li ng-repeat="region in app.regions" ng-class="{'active': (app.selRegion || {}).id == region.id}">
+        <a href ng-click="SelectRegion(region)">
+            <b class="badge bg-info pull-right">{{region.order_amount}}</b>
+            <span><strong class="h3 m-t">{{region.order_total_weight}}</strong>&nbsp;кг</span>
+            <span class="">{{region.name}}</span>
+        </a>
+    </li>
+</ul>
+<!-- / list -->

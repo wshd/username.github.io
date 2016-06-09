@@ -1,0 +1,28 @@
+<div class="modal-body wrapper-lg">
+    <h3 class="m-t-none m-b font-thin">{{clientToEdit.isNew ? "Додати" : "Редагувати"}} клієнта</h3>
+    <form novalidate name="ClientForm" >
+        <div class="row">
+            <div class="col-xs-12">
+                <input type="hidden" ng-model="clientToEdit.id" value="{{clientToEdit.id}}" />
+                <div class="form-group">
+                    <label>П.І.П.:</label>
+                    <input class="form-control" type="text" ng-model="clientToEdit.name" value="{{clientToEdit.name}}" required autofocus />
+                </div>
+                <div class="form-group">
+                    <label>Регіон:</label>
+                    <select class="form-control" ng-model="clientToEdit.region_id" ng-options="region.id as region.name for region in regions" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Адреса:</label>
+                    <input class="form-control" type="text" ng-model="clientToEdit.address" value="{{clientToEdit.address}}" />
+                </div>
+                <div class="form-group">
+                    <label>Телефон:</label>
+                    <input class="form-control" type="text" ng-model="clientToEdit.phone" value="{{clientToEdit.phone}}" required />
+                </div>
+            </div>
+        </div>
+        <button class="btn btn-info" ng-disabled="ClientForm.$invalid || isUnchanged()" ng-click="$close(clientToEdit)"><i class="glyphicon glyphicon-floppy-disk"></i>  Зберегти</button>
+        <a href class="btn" ng-click="$dismiss('cancel')">Відмінити</a>
+    </form>
+</div>

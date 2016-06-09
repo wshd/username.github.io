@@ -1,0 +1,19 @@
+<div class="container w-xxl w-auto-xs " ng-init="app.settings.container = false;">
+  <a href class="navbar-brand block m-t"><i class="fa fa-truck"></i> {{app.name}}</a>
+  <div class="m-b-lg">
+    <form name="form" class="form-validation">
+      <div class="text-danger wrapper text-center" ng-show="authError">
+          {{authError}}
+      </div>
+      <div class="list-group list-group-sm box-shadow-lg">
+        <div class="list-group-item">
+          <input type="email" placeholder="Email" class="form-control no-border" ng-model="user.email" required>
+        </div>
+        <div class="list-group-item">
+           <input type="password" placeholder="Пароль" class="form-control no-border" ng-model="user.password" required>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-info btn-lg btn-block" ng-click="login()" ng-disabled='form.$invalid'>Увійти</button>
+    </form>
+  </div>
+</div>

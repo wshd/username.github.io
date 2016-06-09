@@ -1,0 +1,11 @@
+<div class="modal-body wrapper-lg">
+    <h3 class="m-t-none m-b font-thin">Видалити регіон</h3>
+    <blockquote>
+        <h3 class="text-danger">{{regionToDelete.name}}</h3>
+    </blockquote>
+
+    <p>Ви впевнені що хочете видалити цей регіон?</p>
+    <button class="btn btn-danger" ng-click="$close(regionToDelete)"><i class="glyphicon glyphicon-trash"></i> Видалити
+    </button>
+    <a href class="btn" ng-click="$dismiss('cancel')">Відмінити</a>
+</div>

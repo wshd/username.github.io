@@ -1,0 +1,66 @@
+<div class="bg-light lter b-b wrapper-md" ng-init="app.settings.asideHide = true">
+    <a class="pull-right btn btn-sm btn-success" href ng-click="add()"><i class="glyphicon glyphicon-plus"></i></a>
+    <h1 class="m-n font-thin h3"><i class="icon-users fa-fw"></i> &nbsp; Клієнти</h1>
+</div>
+<div class="wrapper-md" st-table="displayClients" st-safe-src="clients">
+    <div class="row">
+        <div class="m-sm">
+            <div class="panel panel-info">
+                <div class="panel-heading wrapper-md">
+                    <div class="input-group">
+                        <input st-search=""  class="form-control" placeholder="Пошук..." type="search"/>
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="m-sm">
+            <div class="panel panel-default">
+                <div class="table-responsive" ng-show="clients.length > 0">
+                    <table class="table table-condensed b-light">
+                        <thead class="bg-info text-white">
+                        <tr>
+                            <th st-sort="name">П.І.П.</th>
+                            <th st-sort="phone"><i class="icon-call-end fa-fw"></i></th>
+                            <th st-sort="address"><i class="icon-home fa-fw"></i></th>
+                            <th st-sort="region"><i class="icon-direction fa-fw"></i></th>
+                            <th st-sort="orders"><i class="icon-present fa-fw"></i></th>
+                            <th>&nbsp;</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="client in displayClients">
+                            <td>{{client.name}}</td>
+                            <td>{{client.phone}}</td>
+                            <td>{{client.address}}</td>
+                            <td>{{client.region}}</td>
+                            <td>{{client.orders}}</td>
+                            <td class="commands">
+                                <div class="btn-group btn-group-nowrap" role="group">
+                                    <button href ng-click="edit(client)" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-pencil"></i></button>
+                                    <button ng-click="delete(client)" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-trash"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="5" class="text-center">
+                                <div st-pagination="" st-items-by-page="app.settings.itemsPerPage" st-displayed-pages="7"></div>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="wrapper-lg" ng-show="isLoading">
+                    <progressbar class="progress-striped active" value="100" type="info">Завантаження...</progressbar>
+                </div>
+                <footer class="panel-footer text-muted text-shadow text-center bg-light dker wrapper-lg" ng-hide="clients.length > 0  || isLoading">
+                    <div class="h2">Немає жодного клієнта</div>
+                </footer>
+            </div>
+        </div>
+    </div>
+</div>
