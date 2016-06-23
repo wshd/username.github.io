@@ -7,9 +7,13 @@ app.controller('RegionCtrl', ['$scope', '$modal', 'Storage', 'Notify',
             reload();
         });
 
+        var applyData = function (data) {
+            $scope.regions = data;
+        };
+
         var reload = function () {
             Storage.getSP('regions_with_totals').then(function (data) {
-                    $scope.regions = data;
+                    applyData(data);
                     $scope.isLoading = false;
                 },
                 function (msg) {
@@ -18,7 +22,20 @@ app.controller('RegionCtrl', ['$scope', '$modal', 'Storage', 'Notify',
                     $scope.isLoading = false;
                 });
         };
-        reload();
+
+        var reloadFromCache = function () {
+            localforage.getItem('regions_with_totals').then(function (data) {
+                applyData(data);
+                if (data != null) {
+                    $scope.isLoading = false;
+                }
+                reload();
+            }).catch(function () {
+                reload();
+            });
+        };
+
+        reloadFromCache();
 
         var showError = function (action, name) {
             var messages = {

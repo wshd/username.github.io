@@ -24,8 +24,9 @@ angular.module('app')
       function ($stateProvider,   $urlRouterProvider) {
 
           var authenticated = ['Auth', function (Auth) {
-              if (!Auth.currentUser()) throw "User not authorized!";
-              return true;
+              //if (!Auth.currentUser()) throw "User not authorized!";
+              //return true;
+              return Auth.currentUser();
           }];
 
           $urlRouterProvider

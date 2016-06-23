@@ -1,19 +1,22 @@
+importScripts("/lib/localforage.min.js");
+
 var CACHE_NAME = 'ua-gb-cache-v1';
 var urlsToCache = [
     '/',
     '/assets/tpl/app.html',
-    'assets/tpl/blocks/aside.html',
-    'assets/tpl/blocks/header.html',
-    'assets/tpl/blocks/nav.html',
-    'assets/tpl/order/list.html',
-    'assets/tpl/order/history.html',
-    'assets/tpl/client/list.html',
-    'assets/tpl/region/list.html',
+    '/assets/tpl/blocks/aside.html',
+    '/assets/tpl/blocks/header.html',
+    '/assets/tpl/blocks/nav.html',
+    '/assets/tpl/order/list.html',
+    '/assets/tpl/order/history.html',
+    '/assets/tpl/client/list.html',
+    '/assets/tpl/region/list.html',
     '/assets/tpl/login.html',
     '/dist/css/ua-gb.css',
-    '/dist/css/vendor.css',
+    '/dist/css/vendor.min.css',
     '/dist/js/ua-gb.js',
     '/dist/js/vendor.js',
+    '/lib/localforage.min.js',
     '/dist/img/bg.jpg',
     '/dist/fonts/fontawesome-webfont.eot',
     '/dist/fonts/fontawesome-webfont.svg',
@@ -34,6 +37,7 @@ var urlsToCache = [
     '/dist/fonts/sourcesanspro/sourcesanspro.woff'
 ];
 
+
 self.addEventListener('install', function(event) {
     event.waitUntil(
         caches.open(CACHE_NAME)
@@ -45,6 +49,8 @@ self.addEventListener('install', function(event) {
 });
 
 self.addEventListener('fetch', function(event) {
+    var fetchRequest = event.request.clone();
+
     event.respondWith(
         caches.match(event.request)
             .then(function(response) {
@@ -53,13 +59,7 @@ self.addEventListener('fetch', function(event) {
                     return response;
                 }
 
-                // IMPORTANT: Clone the request. A request is a stream and
-                // can only be consumed once. Since we are consuming this
-                // once by cache and once by the browser for fetch, we need
-                // to clone the response
-                var fetchRequest = event.request.clone();
-
-                return fetch(fetchRequest).then(
+                return fetch(event.request).then(
                     function(response) {
                         // Check if we received a valid response
                         if(!response || response.status !== 200 || response.type !== 'cors') {
@@ -72,10 +72,11 @@ self.addEventListener('fetch', function(event) {
                         // to clone it so we have 2 stream.
                         var responseToCache = response.clone();
 
-                        caches.open(CACHE_NAME)
-                            .then(function(cache) {
-                                cache.put(event.request, responseToCache);
+                        getStorageKey(fetchRequest).then(function (key) {
+                            responseToCache.json().then(function (result) {
+                                localforage.setItem(key, result);
                             });
+                        });
 
                         return response;
                     }
@@ -83,3 +84,31 @@ self.addEventListener('fetch', function(event) {
             })
     );
 });
+
+/* Private methods */
+
+var getStorageKey = function (request) {
+    var url = request.url.split('/');
+    var name = '';
+    switch (url[5]) {
+        case '_proc':
+            name = url[6];
+            if (request.method == 'POST') {
+                return request.json().then(function (t) {
+                    if (t && t.params) {
+                        var date = t.params[0].value;
+                        name += "_" + date;
+                    }
+                    return name;
+                }).catch(function (err) {
+                    return Promise.resolve(name);
+                });
+            } else {
+                return Promise.resolve(name);
+            }
+        default:
+            name = url[5];
+            return Promise.resolve(name);
+    }
+
+};

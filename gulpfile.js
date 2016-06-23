@@ -40,7 +40,8 @@ gulp.task('scripts-vendor', function() {
         libDir + 'angular-ui-router.js',
         libDir + 'angular-ui-notification.min.js',
         libDir + 'smart-table.js',
-        libDir + 'angular-dreamfactory.js'
+        libDir + 'angular-dreamfactory.js',
+        libDir + 'localforage.min.js'
     ])
         .pipe(concat('vendor.js'))
         .pipe(gulp.dest(outputDir + 'js'))

@@ -7,9 +7,13 @@ app.controller('ListClientCtrl', [ '$scope', '$http', '$modal', 'Storage', 'Noti
             reload();
         });
 
+        var applyData = function (data) {
+            $scope.clients = data;
+        };
+
         var reload = function () {
             Storage.getSP('clients_with_totals').then(function (data) {
-                    $scope.clients = data;
+                    applyData(data);
                     $scope.isLoading = false;
                 },
                 function (msg) {
@@ -23,7 +27,20 @@ app.controller('ListClientCtrl', [ '$scope', '$http', '$modal', 'Storage', 'Noti
                     console.log('Regions loading failed. ' + msg);
                 });
         };
-        reload();
+
+        var reloadFromCache = function () {
+            localforage.getItem('clients_with_totals').then(function (data) {
+                applyData(data);
+                if (data != null) {
+                    $scope.isLoading = false;
+                }
+                reload();
+            }).catch(function () {
+                reload();
+            });
+        };
+
+        reloadFromCache();
 
         var showError = function (action, name) {
             var messages = {

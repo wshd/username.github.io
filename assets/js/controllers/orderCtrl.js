@@ -13,20 +13,36 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
             FilterOrders();
         });
 
+        var applyOrders = function (data) {
+            angular.forEach(data, function (v, k) {
+                v._bags = angular.fromJson(v.bags);
+                v._goods = angular.fromJson(v.goods);
+            });
+            $scope.orders = data;
+            FilterOrders();
+        };
 
-        var reload = function () {
+        var applyRegionsByDate = function (data) {
+            $scope.app.regions = data;
+        };
+
+        var applyRegions = function (data) {
+            $scope.regions = data;
+        };
+
+        var applyClients = function (data) {
+            $scope.clients = data;
+        };
+
+        var reloadOrders = function () {
             var params = [{
                 name: "sel_date",
                 param_type: "date",
                 value: $scope.app.selDate
             }];
+
             Storage.getSP_params('orders_by_date', params).then(function (data) {
-                    angular.forEach(data, function (v, k) {
-                        v._bags = angular.fromJson(v.bags);
-                        v._goods = angular.fromJson(v.goods);
-                    });
-                    $scope.orders = data;
-                    FilterOrders();
+                    applyOrders(data);
                     orderLoading = false;
                     calcLoading();
                 },
@@ -36,27 +52,39 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
                     orderLoading = false;
                     calcLoading();
                 });
+        };
 
-            Storage.getSP_params('region_orders_by_date', params).then(function (data) {
-                    $scope.app.regions = data;
-                    regionLoading = false;
-                    calcLoading();
-                },
-                function (msg) {
-                    console.log('Orders loading failed. ' + msg);
-                    showError('list', null);
-                    regionLoading = false;
-                    calcLoading();
-                });
-
+        var reloadRegions = function () {
             Storage.get('region').then(function (data) {
-                $scope.regions = data;
+                applyRegions(data);
             }, function (msg) {
                 console.log('Regions loading failed. ' + msg);
             });
+        };
 
+        var reloadRegionsByDate = function () {
+            var params = [{
+                name: "sel_date",
+                param_type: "date",
+                value: $scope.app.selDate
+            }];
+
+            Storage.getSP_params('region_orders_by_date', params).then(function (data) {
+                    applyRegionsByDate(data);
+                    regionLoading = false;
+                    calcLoading();
+                },
+                function (msg) {
+                    console.log('Orders loading failed. ' + msg);
+                    showError('list', null);
+                    regionLoading = false;
+                    calcLoading();
+                });
+        };
+
+        var reloadClients = function () {
             Storage.getSP('clients_with_totals').then(function (data) {
-                $scope.clients = data;
+                applyClients(data);
                 clientLoading = false;
                 calcLoading();
             }, function (msg) {
@@ -65,7 +93,63 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
                 calcLoading();
             });
         };
-        reload();
+
+
+        var reloadCachedOrders = function () {
+            localforage.getItem('orders_by_date_' + $scope.app.selDate).then(function (data) {
+                applyOrders(data);
+                if (data != null) {
+                    orderLoading = false;
+                    calcLoading();
+                }
+                reloadOrders();
+            }).catch(function () { reloadOrders(); });
+        };
+
+        var reloadCachedRegions = function () {
+            localforage.getItem('region').then(function (data) {
+                applyRegions(data);
+                reloadRegions();
+            }).catch(function () { reloadRegions(); });
+        };
+
+        var reloadCachedRegionsByDate = function () {
+            localforage.getItem('region_orders_by_date_' + $scope.app.selDate).then(function (data) {
+                applyRegionsByDate(data);
+                if (data != null) {
+                    regionLoading = false;
+                    calcLoading();
+                }
+                reloadRegionsByDate();
+            }).catch(function () { reloadRegionsByDate(); });
+        };
+
+        var reloadCachedClients = function () {
+            localforage.getItem('clients_with_totals').then(function (data) {
+                applyClients(data);
+                if (data != null) {
+                    clientLoading = false;
+                    calcLoading();
+                }
+                reloadClients();
+            }).catch(function () { reloadClients(); });
+        };
+
+        var reload = function () {
+            reloadOrders();
+            reloadRegionsByDate();
+            reloadRegions();
+            reloadClients();
+        };
+
+
+        var reloadFromCache = function () {
+            reloadCachedOrders();
+            reloadCachedRegionsByDate();
+            reloadCachedRegions();
+            reloadCachedClients();
+        };
+        reloadFromCache();
 
         var calcLoading = function () {
             $scope.isLoading = orderLoading || regionLoading || clientLoading;
@@ -294,14 +378,18 @@ app.controller('HistoryOrderCtrl', [ '$scope', '$state', '$filter', 'Storage', '
             reload();
         });
 
+        var applyData = function (data) {
+            if (data[0].date == today.date){
+                data[0].isToday = true;
+            }else{
+                data = [ today].concat(data);
+            }
+            $scope.dates = data;
+        };
+
         var reload = function () {
             Storage.getSP('order_history').then(function (data) {
-                if (data[0].date == today.date){
-                    data[0].isToday = true;
-                }else{
-                    data = [ today].concat(data);
-                }
-                $scope.dates = data;
+                applyData(data);
                 $scope.isLoading = false;
             }, function (msg) {
                 console.log('Order history loading failed. ' + msg);
@@ -309,7 +397,20 @@ app.controller('HistoryOrderCtrl', [ '$scope', '$state', '$filter', 'Storage', '
                 $scope.isLoading = false;
             });
         };
-        reload();
+
+        var reloadFromCache = function () {
+            localforage.getItem('order_history').then(function (data) {
+                applyData(data);
+                if (data != null) {
+                    $scope.isLoading = false;
+                }
+                reload();
+            }).catch(function () {
+                reload();
+            });
+        };
+
+        reloadFromCache();
 
         $scope.selectDate = function (newDate) {
             $scope.app.selDate = newDate;

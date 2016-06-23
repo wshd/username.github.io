@@ -8,10 +8,11 @@ app.service('Storage', [ '$q', 'DreamFactory', '$http',  'Auth',
         };
 
         var checkAuth = function(){
-            var sessionUser = Auth.currentUser();
-            if (sessionUser && !$http.defaults.headers.common["X-DreamFactory-Session-Token"]) {
-                $http.defaults.headers.common["X-DreamFactory-Session-Token"] = sessionUser.session_id;
-            }
+            Auth.currentUser().then(function (sessionUser) {
+                if (sessionUser && !$http.defaults.headers.common["X-DreamFactory-Session-Token"]) {
+                    $http.defaults.headers.common["X-DreamFactory-Session-Token"] = sessionUser.session_id;
+                }
+            });
         };
 
         var _get = function (table) {

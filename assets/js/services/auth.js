@@ -10,7 +10,7 @@ app.service('Auth', [ '$q', '$http', 'DreamFactory',
                 DreamFactory.api.user.login(callParams,
                     function (data) {
                         $http.defaults.headers.common["X-DreamFactory-Session-Token"] = data.session_id;
-                        sessionStorage.setItem('currentUser', JSON.stringify(data));
+                        localforage.setItem('currentUser', data);
                         deffered.resolve(data);
                     },
                     function (msg) {
@@ -27,7 +27,7 @@ app.service('Auth', [ '$q', '$http', 'DreamFactory',
                 DreamFactory.api.user.logout( {},
                     function (data) {
                         delete $http.defaults.headers.common["X-DreamFactory-Session-Token"];
-                        sessionStorage.removeItem('currentUser');
+                        localforage.removeItem('currentUser');
                         deffered.resolve(data);
                     },
                     function (msg) {
@@ -39,8 +39,7 @@ app.service('Auth', [ '$q', '$http', 'DreamFactory',
         };
 
         var _currentUser = function () {
-            var user = sessionStorage.getItem('currentUser');
-            return user ? JSON.parse(user) : null;
+            return localforage.getItem('currentUser');
         };
 
         return {
