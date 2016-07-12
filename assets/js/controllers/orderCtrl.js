@@ -24,6 +24,7 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
 
         var applyRegionsByDate = function (data) {
             $scope.app.regions = data;
+            drawChart();
         };
 
         var applyRegions = function (data) {
@@ -175,6 +176,35 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
             for (i; i<max; i++){ total += parseInt(regs[i].order_total_weight) || 0; }
             return total;
         }
+
+        var drawChart = function () {
+            var rows = [];
+            $scope.chart = {};
+
+            $scope.chart.type = "BarChart";
+
+            angular.forEach($scope.app.regions, function (v) {
+                var row = {c: []};
+                row.c.push({v: v.name});
+                row.c.push({v: v.order_amount});
+                row.c.push({v: v.order_total_weight});
+                rows.push(row);
+            });
+
+            $scope.chart.data = {"cols": [
+                {id: "r", label: "Region", type: "string"},
+                {id: "a", label: "Кількість", type: "number"},
+                {id: "w", label: "Вага (кг)", type: "number"}
+            ], "rows": rows
+            };
+
+            $scope.chart.options = {
+                'colors': ['#f05050', '#16aad8'],
+                'isStacked': 'true',
+                'chartArea': {'left': '150', 'right': '15', 'top': '10', 'width': '100%', 'height': '80%'},
+                'legend': {'position': 'bottom'}
+            };
+        };
 
         var showError = function (action, name) {
             var messages = {
@@ -385,6 +415,7 @@ app.controller('HistoryOrderCtrl', [ '$scope', '$state', '$filter', 'Storage', '
                 data = [ today].concat(data);
             }
             $scope.dates = data;
+            drawChart();
         };
 
         var reload = function () {
@@ -411,6 +442,37 @@ app.controller('HistoryOrderCtrl', [ '$scope', '$state', '$filter', 'Storage', '
         };
 
         reloadFromCache();
+
+        var drawChart = function () {
+            var rows = [];
+            $scope.chart = {};
+
+            $scope.chart.type = "LineChart";
+
+            angular.forEach($scope.dates, function (v) {
+                var row = {c: []};
+                row.c.push({v: new Date(v.date)});
+                row.c.push({v: v.amount});
+                row.c.push({v: v.total_weight});
+                rows.push(row);
+            });
+
+            $scope.chart.data = {"cols": [
+                {id: "d", label: "Дата", type: "date"},
+                {id: "a", label: "Кількість", type: "number"},
+                {id: "w", label: "Вага (кг)", type: "number"}
+            ], "rows": rows
+            };
+
+            $scope.chart.options = {
+                'colors': ['#f05050', '#16aad8'],
+                'isStacked': 'true',
+                'chartArea': {'left': '50', 'right': '15', 'top': '10', 'width': '100%', 'height': '80%'},
+                'legend': {'position': 'bottom'},
+                "fill": 20,
+                "displayExactValues": true
+            };
+        };
 
         $scope.selectDate = function (newDate) {
             $scope.app.selDate = newDate;

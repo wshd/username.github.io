@@ -5,6 +5,19 @@
 <div class="wrapper-md">
     <div class="row">
         <div class="m-sm">
+            <div class="panel panel-default hidden-print">
+                <div class="panel-heading bg-info lt wrapper-sm">
+                    <button type="button" class="btn btn-default btn-xs pull-right" ng-click="toggleCharts()"><i class="glyphicon glyphicon-stats"></i></button>
+                    <span class="h4 text-white">Статистика</span>
+                </div>
+                <div ng-show="app.showCharts">
+                    <div google-chart chart="chart" style="height:300px; width:100%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="m-sm">
             <div class="panel panel-default">
                 <div class="panel-heading bg-info dk wrapper-sm">
                     <div class="m-sm">

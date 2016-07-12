@@ -40,6 +40,7 @@ gulp.task('scripts-vendor', function() {
         libDir + 'angular-ui-router.js',
         libDir + 'angular-ui-notification.min.js',
         libDir + 'smart-table.js',
+        libDir + 'ng-google-chart.min.js',
         libDir + 'angular-dreamfactory.js',
         libDir + 'localforage.min.js'
     ])
@@ -111,7 +112,7 @@ gulp.task('browser-sync', function() {
 });
 
 /* Watch scss, js and html files, doing different things with each. */
-gulp.task('default', ['css-vendor', 'css', 'scripts', 'font-sync', 'img-sync', 'browser-sync'], function () {
+gulp.task('default', ['css-vendor', 'css', 'scripts', 'scripts-vendor', 'font-sync', 'img-sync', 'browser-sync'], function () {
     gulp.watch([libDir + '**/*.js'], ['scripts-vendor']);
     gulp.watch([libDir + 'css/*.css'], ['css-vendor']);
     gulp.watch([assetsDir + 'css/*.css'], ['css']);

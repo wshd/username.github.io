@@ -41,6 +41,7 @@ angular.module('app')
                     itemsPerPage: 25
                 },
                 Notification: Notification,
+                showCharts: true,
                 selDate: $filter('date')(new Date(), 'yyyy-MM-dd'),
                 regions: [],
                 selRegion: {}
@@ -63,6 +64,10 @@ angular.module('app')
 
             $scope.print = function () {
                 $window.print();
+            };
+
+            $scope.toggleCharts = function () {
+                $scope.app.showCharts = !$scope.app.showCharts;
             };
 
             // save settings to local storage

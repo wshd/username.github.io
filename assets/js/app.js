@@ -3,6 +3,7 @@ angular.module('app', [
     'ui.bootstrap',
     'ui-notification',
     'smart-table',
+    'googlechart',
     'ngDreamFactory'
 ]);
 
