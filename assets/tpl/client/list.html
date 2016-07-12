@@ -26,7 +26,7 @@
                             <th st-sort="phone"><i class="icon-call-end fa-fw"></i></th>
                             <th st-sort="address"><i class="icon-home fa-fw"></i></th>
                             <th st-sort="region"><i class="icon-direction fa-fw"></i></th>
-                            <th st-sort="orders"><i class="icon-present fa-fw"></i></th>
+                            <th st-sort="orders_int"><i class="icon-present fa-fw"></i></th>
                             <th>&nbsp;</th>
                         </tr>
                         </thead>
@@ -36,7 +36,7 @@
                             <td>{{client.phone}}</td>
                             <td>{{client.address}}</td>
                             <td>{{client.region}}</td>
-                            <td>{{client.orders}}</td>
+                            <td>{{client.orders_int}}</td>
                             <td class="commands">
                                 <div class="btn-group btn-group-nowrap" role="group">
                                     <button href ng-click="edit(client)" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-pencil"></i></button>

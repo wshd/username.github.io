@@ -409,13 +409,13 @@ app.controller('HistoryOrderCtrl', [ '$scope', '$state', '$filter', 'Storage', '
         });
 
         var applyData = function (data) {
+            drawChart(data);
             if (data[0].date == today.date){
                 data[0].isToday = true;
             }else{
                 data = [ today].concat(data);
             }
             $scope.dates = data;
-            drawChart();
         };
 
         var reload = function () {
@@ -443,13 +443,13 @@ app.controller('HistoryOrderCtrl', [ '$scope', '$state', '$filter', 'Storage', '
 
         reloadFromCache();
 
-        var drawChart = function () {
+        var drawChart = function (data) {
             var rows = [];
             $scope.chart = {};
 
             $scope.chart.type = "LineChart";
 
-            angular.forEach($scope.dates, function (v) {
+            angular.forEach(data, function (v) {
                 var row = {c: []};
                 row.c.push({v: new Date(v.date)});
                 row.c.push({v: v.amount});
@@ -467,7 +467,7 @@ app.controller('HistoryOrderCtrl', [ '$scope', '$state', '$filter', 'Storage', '
             $scope.chart.options = {
                 'colors': ['#f05050', '#16aad8'],
                 'isStacked': 'true',
-                'chartArea': {'left': '50', 'right': '15', 'top': '10', 'width': '100%', 'height': '80%'},
+                'chartArea': {'left': '70', 'right': '15', 'top': '10', 'width': '100%', 'height': '80%'},
                 'legend': {'position': 'bottom'},
                 "fill": 20,
                 "displayExactValues": true

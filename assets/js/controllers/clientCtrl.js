@@ -7,8 +7,15 @@ app.controller('ListClientCtrl', [ '$scope', '$http', '$modal', 'Storage', 'Noti
             reload();
         });
 
+        var dataTransform = function (data) {
+            return data.map(function (o) {
+                o.orders_int = parseInt(o.orders);
+                return o;
+            });
+        };
+
         var applyData = function (data) {
-            $scope.clients = data;
+            $scope.clients = dataTransform(data);
         };
 
         var reload = function () {
