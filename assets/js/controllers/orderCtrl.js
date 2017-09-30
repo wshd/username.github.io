@@ -36,63 +36,80 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
         };
 
         var reloadOrders = function () {
-            var params = [{
-                name: "sel_date",
-                param_type: "date",
-                value: $scope.app.selDate
-            }];
+            if (window.navigator.onLine) {
+                var params = [{
+                    name: "sel_date",
+                    param_type: "date",
+                    value: $scope.app.selDate
+                }];
 
-            Storage.getSP_params('orders_by_date', params).then(function (data) {
-                    applyOrders(data);
-                    orderLoading = false;
-                    calcLoading();
-                },
-                function (msg) {
-                    console.log('Orders loading failed. ' + msg);
-                    showError('list', null);
-                    orderLoading = false;
-                    calcLoading();
-                });
+                Storage.getSP_params('orders_by_date', params).then(function (data) {
+                        applyOrders(data);
+                        orderLoading = false;
+                        calcLoading();
+                    },
+                    function (msg) {
+                        console.log('Orders loading failed. ' + msg);
+                        showError('list', null);
+                        orderLoading = false;
+                        calcLoading();
+                    });
+            } else {
+                orderLoading = false;
+                calcLoading();
+            }
         };
 
         var reloadRegions = function () {
-            Storage.get('region').then(function (data) {
-                applyRegions(data);
-            }, function (msg) {
-                console.log('Regions loading failed. ' + msg);
-            });
+            if (window.navigator.onLine) {
+                Storage.get('region').then(function (data) {
+                    applyRegions(data);
+                }, function (msg) {
+                    console.log('Regions loading failed. ' + msg);
+                });
+            }
         };
 
         var reloadRegionsByDate = function () {
-            var params = [{
-                name: "sel_date",
-                param_type: "date",
-                value: $scope.app.selDate
-            }];
+            if (window.navigator.onLine) {
+                var params = [{
+                    name: "sel_date",
+                    param_type: "date",
+                    value: $scope.app.selDate
+                }];
 
-            Storage.getSP_params('region_orders_by_date', params).then(function (data) {
-                    applyRegionsByDate(data);
-                    regionLoading = false;
-                    calcLoading();
-                },
-                function (msg) {
-                    console.log('Orders loading failed. ' + msg);
-                    showError('list', null);
-                    regionLoading = false;
-                    calcLoading();
-                });
+                Storage.getSP_params('region_orders_by_date', params).then(function (data) {
+                        applyRegionsByDate(data);
+                        regionLoading = false;
+                        calcLoading();
+                    },
+                    function (msg) {
+                        console.log('Orders loading failed. ' + msg);
+                        showError('list', null);
+                        regionLoading = false;
+                        calcLoading();
+                    });
+            } else {
+                regionLoading = false;
+                calcLoading();
+            }
         };
 
         var reloadClients = function () {
-            Storage.getSP('clients_with_totals').then(function (data) {
-                applyClients(data);
+            if (window.navigator.onLine) {
+                Storage.getSP('clients_with_totals').then(function (data) {
+                    applyClients(data);
+                    clientLoading = false;
+                    calcLoading();
+                }, function (msg) {
+                    console.log('Clients loading failed. ' + msg);
+                    clientLoading = false;
+                    calcLoading();
+                });
+            } else {
                 clientLoading = false;
                 calcLoading();
-            }, function (msg) {
-                console.log('Clients loading failed. ' + msg);
-                clientLoading = false;
-                calcLoading();
-            });
+            }
         };
 
 
@@ -419,14 +436,18 @@ app.controller('HistoryOrderCtrl', [ '$scope', '$state', '$filter', 'Storage', '
         };
 
         var reload = function () {
-            Storage.getSP('order_history').then(function (data) {
-                applyData(data);
+            if (window.navigator.onLine) {
+                Storage.getSP('order_history').then(function (data) {
+                    applyData(data);
+                    $scope.isLoading = false;
+                }, function (msg) {
+                    console.log('Order history loading failed. ' + msg);
+                    Notify.error('order', 'list', null, 'Помилка при завантаженні історії замовлень!');
+                    $scope.isLoading = false;
+                });
+            } else {
                 $scope.isLoading = false;
-            }, function (msg) {
-                console.log('Order history loading failed. ' + msg);
-                Notify.error('order', 'list', null, 'Помилка при завантаженні історії замовлень!');
-                $scope.isLoading = false;
-            });
+            }
         };
 
         var reloadFromCache = function () {

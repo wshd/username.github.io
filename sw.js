@@ -90,11 +90,12 @@ self.addEventListener('fetch', function(event) {
 var getStorageKey = function (request) {
     var url = request.url.split('/');
     var name = '';
-    switch (url[5]) {
-        case '_proc':
+    switch (url[4]) {
+        case 'sp':
             name = url[6];
+            /*
             if (request.method == 'POST') {
-                return request.json().then(function (t) {
+                return request.formData().then(function (t) {
                     if (t && t.params) {
                         var date = t.params[0].value;
                         name += "_" + date;
@@ -105,7 +106,8 @@ var getStorageKey = function (request) {
                 });
             } else {
                 return Promise.resolve(name);
-            }
+            } */
+            return Promise.resolve(name);
         default:
             name = url[5];
             return Promise.resolve(name);

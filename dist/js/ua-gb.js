@@ -15,7 +15,7 @@ var app =
         .constant('DSP_URL', 'https://dream-wshd.rhcloud.com')
         .constant('DSP_API_KEY', 'uagb')
         .config(['$httpProvider', 'DSP_API_KEY', function($httpProvider, DSP_API_KEY) {
-            $httpProvider.defaults.headers.common['X-DreamFactory-Application-Name'] = DSP_API_KEY;
+            // $httpProvider.defaults.headers.common['X-DreamFactory-Application-Name'] = DSP_API_KEY;
         }])
         .config(
         [        '$controllerProvider', '$compileProvider', '$filterProvider', '$provide',
@@ -732,7 +732,7 @@ angular.module('app')
             // config
             $scope.app = {
                 name: 'UA-GB',
-                version: '1.0.3(10.08.2015)',
+                version: '1.0.4(30.09.2017)',
                 // for chart colors
                 color: {
                     primary: '#7266ba',
@@ -1046,63 +1046,80 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
         };
 
         var reloadOrders = function () {
-            var params = [{
-                name: "sel_date",
-                param_type: "date",
-                value: $scope.app.selDate
-            }];
+            if (window.navigator.onLine) {
+                var params = [{
+                    name: "sel_date",
+                    param_type: "date",
+                    value: $scope.app.selDate
+                }];
 
-            Storage.getSP_params('orders_by_date', params).then(function (data) {
-                    applyOrders(data);
-                    orderLoading = false;
-                    calcLoading();
-                },
-                function (msg) {
-                    console.log('Orders loading failed. ' + msg);
-                    showError('list', null);
-                    orderLoading = false;
-                    calcLoading();
-                });
+                Storage.getSP_params('orders_by_date', params).then(function (data) {
+                        applyOrders(data);
+                        orderLoading = false;
+                        calcLoading();
+                    },
+                    function (msg) {
+                        console.log('Orders loading failed. ' + msg);
+                        showError('list', null);
+                        orderLoading = false;
+                        calcLoading();
+                    });
+            } else {
+                orderLoading = false;
+                calcLoading();
+            }
         };
 
         var reloadRegions = function () {
-            Storage.get('region').then(function (data) {
-                applyRegions(data);
-            }, function (msg) {
-                console.log('Regions loading failed. ' + msg);
-            });
+            if (window.navigator.onLine) {
+                Storage.get('region').then(function (data) {
+                    applyRegions(data);
+                }, function (msg) {
+                    console.log('Regions loading failed. ' + msg);
+                });
+            }
         };
 
         var reloadRegionsByDate = function () {
-            var params = [{
-                name: "sel_date",
-                param_type: "date",
-                value: $scope.app.selDate
-            }];
+            if (window.navigator.onLine) {
+                var params = [{
+                    name: "sel_date",
+                    param_type: "date",
+                    value: $scope.app.selDate
+                }];
 
-            Storage.getSP_params('region_orders_by_date', params).then(function (data) {
-                    applyRegionsByDate(data);
-                    regionLoading = false;
-                    calcLoading();
-                },
-                function (msg) {
-                    console.log('Orders loading failed. ' + msg);
-                    showError('list', null);
-                    regionLoading = false;
-                    calcLoading();
-                });
+                Storage.getSP_params('region_orders_by_date', params).then(function (data) {
+                        applyRegionsByDate(data);
+                        regionLoading = false;
+                        calcLoading();
+                    },
+                    function (msg) {
+                        console.log('Orders loading failed. ' + msg);
+                        showError('list', null);
+                        regionLoading = false;
+                        calcLoading();
+                    });
+            } else {
+                regionLoading = false;
+                calcLoading();
+            }
         };
 
         var reloadClients = function () {
-            Storage.getSP('clients_with_totals').then(function (data) {
-                applyClients(data);
+            if (window.navigator.onLine) {
+                Storage.getSP('clients_with_totals').then(function (data) {
+                    applyClients(data);
+                    clientLoading = false;
+                    calcLoading();
+                }, function (msg) {
+                    console.log('Clients loading failed. ' + msg);
+                    clientLoading = false;
+                    calcLoading();
+                });
+            } else {
                 clientLoading = false;
                 calcLoading();
-            }, function (msg) {
-                console.log('Clients loading failed. ' + msg);
-                clientLoading = false;
-                calcLoading();
-            });
+            }
         };
 
 
@@ -1429,14 +1446,18 @@ app.controller('HistoryOrderCtrl', [ '$scope', '$state', '$filter', 'Storage', '
         };
 
         var reload = function () {
-            Storage.getSP('order_history').then(function (data) {
-                applyData(data);
+            if (window.navigator.onLine) {
+                Storage.getSP('order_history').then(function (data) {
+                    applyData(data);
+                    $scope.isLoading = false;
+                }, function (msg) {
+                    console.log('Order history loading failed. ' + msg);
+                    Notify.error('order', 'list', null, 'Помилка при завантаженні історії замовлень!');
+                    $scope.isLoading = false;
+                });
+            } else {
                 $scope.isLoading = false;
-            }, function (msg) {
-                console.log('Order history loading failed. ' + msg);
-                Notify.error('order', 'list', null, 'Помилка при завантаженні історії замовлень!');
-                $scope.isLoading = false;
-            });
+            }
         };
 
         var reloadFromCache = function () {
@@ -2105,6 +2126,86 @@ app.service('Auth', [ '$q', '$http', 'DreamFactory',
             }
         };
     }]);
+app.service('DB', [ '$q', '$http',
+
+    function ($q, $http) {
+        var apiUrl = "https://mintfox.com.ua/api/api.php/";
+        var apiSpUrl = "https://mintfox.com.ua/api/sp/api.php/";
+        var suffix = "?transform=1"
+
+        function handleError(e){
+            if (e.error.length > 0 && e.error[0].code == 403) {
+                window.location = '#/access/logout';
+            }
+        };
+
+        var _getRecords = function (table) {
+            var url = apiUrl + table + suffix;
+            return $http.get(url).then(function(r) {
+                return r.data[table] || [];
+            }).catch(handleError);
+        };
+
+        var _callStoredProc = function (spname) {
+            var url = apiSpUrl + spname;
+            return $http.post(url).then(function(r) {
+                return r.data[0] || [];
+            }).catch(handleError)
+        };
+
+        var _callStoredProcWithParams = function (spname, params) {
+            var url = apiSpUrl + spname + "?" + params[0].value;
+            var httpParams = {};        // TODO: send params in correct format
+            params.forEach(function(p){
+                httpParams[p.name] = p.value;
+            });
+
+            return $http({
+                method: 'POST',
+                url: url,
+                data: $.param(httpParams),
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+            }).then(function(r) {
+                return r.data[0] || [];
+            }).catch(handleError);
+        };
+
+        function _createRecords(table, item) {
+            var url = apiUrl + table;
+            return $http.post(url, item).catch(handleError);
+        };
+
+        function _updateRecords(table, item) {
+            var url = apiUrl + table + "/" + item.id;
+            return $http.put(url, item).catch(handleError);
+        };
+
+        function _deleteRecords(table, id) {
+            var url = apiUrl + table + "/" + id;
+            return $http.delete(url).catch(handleError);
+        };
+
+        return {
+            getRecords: function (table) {
+                return _getRecords(table);
+            },
+            callStoredProc: function(spname) {
+                return _callStoredProc(spname);
+            },
+            callStoredProcWithParams: function(spname, params) {
+                return _callStoredProcWithParams(spname, params);
+            },
+            createRecords: function (table, item) {
+                return _createRecords(table, item);
+            },
+            updateRecords: function (table, item) {
+                return _updateRecords(table, item);
+            },
+            deleteRecords: function (table, id) {
+                return _deleteRecords(table, id);
+            }
+        };
+    }]);
 app.service('Notify', [ 'Notification',
     function (Notification) {
         var DELAY = 3000;
@@ -2145,7 +2246,76 @@ app.service('Notify', [ 'Notification',
             }
         }
     }]);
-app.service('Storage', [ '$q', 'DreamFactory', '$http',  'Auth',
+app.service('Storage', [ '$q', 'DB', '$http',  'Auth',
+    function ($q, db, $http, Auth) {
+
+        function handleError(e){
+            if (e.error.length > 0 && e.error[0].code == 403) {
+                window.location = '#/access/logout';
+            }
+        };
+
+        var checkAuth = function(){
+            Auth.currentUser().then(function (sessionUser) {
+                if (sessionUser && !$http.defaults.headers.common["X-DreamFactory-Session-Token"]) {
+                    $http.defaults.headers.common["X-DreamFactory-Session-Token"] = sessionUser.session_id;
+                }
+            });
+        };
+
+        var _get = function (table) {
+            return db.getRecords(table);
+        };
+
+        var _getSP = function (spname) {
+            return db.callStoredProc(spname);
+
+        };
+
+        var _getSP_params = function (spname, params) {
+            return db.callStoredProcWithParams(spname, params);
+        };
+
+        var _insert = function (table, item) {
+            return db.createRecords(table, item);
+        };
+
+        var _update = function (table, item) {
+            return db.updateRecords(table, item);
+        };
+
+        var _delete = function (table, id) {
+            return db.deleteRecords(table, id);
+        };
+
+        return {
+            get: function (table) {
+                //checkAuth();
+                return _get(table);
+            },
+            getSP: function (spname) {
+                //checkAuth();
+                return _getSP(spname);
+            },
+            getSP_params: function (spname, params) {
+                //checkAuth();
+                return _getSP_params(spname, params);
+            },
+            insert: function (table, item) {
+                //checkAuth();
+                return _insert(table, item);
+            },
+            update: function (table, item) {
+                //checkAuth();
+                return _update(table, item);
+            },
+            delete: function (table, id) {
+                //checkAuth();
+                return _delete(table, id);
+            }
+        };
+    }]);
+app.service('OldStorage', [ '$q', 'DreamFactory', '$http',  'Auth',
     function ($q, DreamFactory, $http, Auth) {
 
         function handleError(e){

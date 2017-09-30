@@ -15,7 +15,7 @@ angular.module('app')
             // config
             $scope.app = {
                 name: 'UA-GB',
-                version: '1.0.3(10.08.2015)',
+                version: '1.0.4(30.09.2017)',
                 // for chart colors
                 color: {
                     primary: '#7266ba',

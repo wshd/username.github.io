@@ -1,5 +1,5 @@
-app.service('Storage', [ '$q', 'DreamFactory', '$http',  'Auth',
-    function ($q, DreamFactory, $http, Auth) {
+app.service('Storage', [ '$q', 'DB', '$http',  'Auth',
+    function ($q, db, $http, Auth) {
 
         function handleError(e){
             if (e.error.length > 0 && e.error[0].code == 403) {
@@ -16,156 +16,53 @@ app.service('Storage', [ '$q', 'DreamFactory', '$http',  'Auth',
         };
 
         var _get = function (table) {
-            var deffered = $q.defer();
-            if (DreamFactory.api.ready){
-                var callParams = {
-                    table_name: table
-                };
-
-                DreamFactory.api.uagb.getRecords(callParams,
-                    function (data) {
-                        deffered.resolve(data.record);
-                    },
-                    function (msg) {
-                        handleError(msg);
-                        deffered.reject(msg);
-                    }
-                );
-            }
-            return deffered.promise;
+            return db.getRecords(table);
         };
 
         var _getSP = function (spname) {
-            var deffered = $q.defer();
-            if (DreamFactory.api.ready){
-                var callParams = {
-                    procedure_name: spname
-                };
-
-                DreamFactory.api.uagb.callStoredProc(callParams,
-                    function (data) {
-                        deffered.resolve(data);
-                    },
-                    function (msg) {
-                        handleError(msg);
-                        deffered.reject(msg);
-                    }
-                );
-            }
-            return deffered.promise;
+            return db.callStoredProc(spname);
 
         };
 
         var _getSP_params = function (spname, params) {
-            var deffered = $q.defer();
-            if (DreamFactory.api.ready){
-                var callParams = {
-                    procedure_name: spname,
-                    body: {
-                        params: params
-                    }
-                };
-
-                DreamFactory.api.uagb.callStoredProcWithParams(callParams,
-                    function (data) {
-                        deffered.resolve(data);
-                    },
-                    function (msg) {
-                        handleError(msg);
-                        deffered.reject(msg);
-                    }
-                );
-            }
-            return deffered.promise;
-
+            return db.callStoredProcWithParams(spname, params);
         };
 
         var _insert = function (table, item) {
-            var deffered = $q.defer();
-            if (DreamFactory.api.ready) {
-                var callParams = {
-                    table_name: table,
-                    body: item
-                };
-
-                DreamFactory.api.uagb.createRecords(callParams,
-                    function (data) {
-                        deffered.resolve(data);
-                    },
-                    function (msg) {
-                        handleError(msg);
-                        deffered.reject(msg);
-                    }
-                );
-            }
-            return deffered.promise;
+            return db.createRecords(table, item);
         };
 
         var _update = function (table, item) {
-            var deffered = $q.defer();
-            if (DreamFactory.api.ready) {
-                var callParams = {
-                    table_name: table,
-                    body: [item]
-                };
-
-                DreamFactory.api.uagb.updateRecords(callParams,
-                    function (data) {
-                        deffered.resolve(data);
-                    },
-                    function (msg) {
-                        handleError(msg);
-                        deffered.reject(msg);
-                    }
-                );
-            }
-            return deffered.promise;
+            return db.updateRecords(table, item);
         };
 
         var _delete = function (table, id) {
-            var deffered = $q.defer();
-            if (DreamFactory.api.ready) {
-                var callParams = {
-                    table_name: table,
-                    ids: id
-                };
-
-                DreamFactory.api.uagb.deleteRecordsByIds(callParams,
-                    function (data) {
-                        deffered.resolve(data);
-                    },
-                    function (msg) {
-                        handleError(msg);
-                        deffered.reject(msg);
-                    }
-                );
-            }
-            return deffered.promise;
+            return db.deleteRecords(table, id);
         };
 
         return {
             get: function (table) {
-                checkAuth();
+                //checkAuth();
                 return _get(table);
             },
             getSP: function (spname) {
-                checkAuth();
+                //checkAuth();
                 return _getSP(spname);
             },
             getSP_params: function (spname, params) {
-                checkAuth();
+                //checkAuth();
                 return _getSP_params(spname, params);
             },
             insert: function (table, item) {
-                checkAuth();
+                //checkAuth();
                 return _insert(table, item);
             },
             update: function (table, item) {
-                checkAuth();
+                //checkAuth();
                 return _update(table, item);
             },
             delete: function (table, id) {
-                checkAuth();
+                //checkAuth();
                 return _delete(table, id);
             }
         };
