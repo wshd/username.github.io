@@ -3,9 +3,6 @@ app.controller('RegionCtrl', ['$scope', '$modal', 'Storage', 'Notify',
         var INSTANCE = 'region';
 
         $scope.isLoading = true;
-        $scope.$on('api:ready', function () {
-            reload();
-        });
 
         var applyData = function (data) {
             $scope.regions = data;

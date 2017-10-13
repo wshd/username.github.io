@@ -5,16 +5,15 @@
  */
 angular.module('app')
   .run(
-    [          '$rootScope', '$state', '$stateParams', 'DreamFactory',
-      function ($rootScope,   $state,   $stateParams, DreamFactory) {
+    [          '$rootScope', '$state', '$stateParams',
+      function ($rootScope,   $state,   $stateParams) {
           $rootScope.$state = $state;
           $rootScope.$stateParams = $stateParams;
-          $rootScope.df = DreamFactory;
 
-          $rootScope.$on('$stateChangeError', function (e) {
+          $rootScope.$on('$stateChangeError', function (e, toState, toParams, fromState, fromParams, error) {
               e.preventDefault();
-              sessionStorage.setItem('stateToGo', '');
-              $state.go('access.login');
+              sessionStorage.setItem('stateToGo', toState.name);
+              $state.go('access.logout');
           });
       }
     ]
@@ -24,9 +23,10 @@ angular.module('app')
       function ($stateProvider,   $urlRouterProvider) {
 
           var authenticated = ['Auth', function (Auth) {
-              //if (!Auth.currentUser()) throw "User not authorized!";
-              //return true;
-              return Auth.currentUser();
+              return Auth.currentUser().then(function(user){
+                  if (!user) throw "User not authorized!";
+                  return user;
+              });
           }];
 
           $urlRouterProvider

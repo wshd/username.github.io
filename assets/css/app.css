@@ -5287,7 +5287,7 @@ select.form-control option {
 
 /* hide aside*/
 
-.app.container.app-aside-hide .app-aside {
+.app.app-aside-hide .app-aside {
     visibility: hidden;
 }
 .app-aside-dock.app-aside-fixed.app-header-fixed.app-aside-hide {

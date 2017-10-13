@@ -6,9 +6,14 @@ app.controller('LoginCtrl', ['$scope', 'Auth',
             Auth.login($scope.user).then(function (data) {
                 var prevState = sessionStorage.getItem('stateToGo');
                 $scope.$state.go(prevState ? prevState : 'app.history');
+                sessionStorage.setItem('stateToGo', '');
             }, function (msg) {
                 console.log(msg);
-                $scope.authError = msg;
+                if (msg.status = 401) {
+                    $scope.authError = "Вхід не виконано. Перевірте правильність пароля та електронної пошти";
+                } else {
+                    $scope.authError = msg;
+                }
             });
         };
 

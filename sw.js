@@ -54,6 +54,8 @@ self.addEventListener('fetch', function(event) {
     event.respondWith(
         caches.match(event.request)
             .then(function(response) {
+                var storageKey = getStorageKey(fetchRequest);
+                var dataKey  = getDataKey(fetchRequest);
                 // Cache hit - return response
                 if (response) {
                     return response;
@@ -62,7 +64,11 @@ self.addEventListener('fetch', function(event) {
                 return fetch(event.request).then(
                     function(response) {
                         // Check if we received a valid response
-                        if(!response || response.status !== 200 || response.type !== 'cors') {
+                        if(!response
+                            || response.status !== 200
+                            || response.type !== 'cors'
+                            || !storageKey
+                            || (!isSp(fetchRequest) && fetchRequest.method != "GET")) {
                             return response;
                         }
 
@@ -72,10 +78,8 @@ self.addEventListener('fetch', function(event) {
                         // to clone it so we have 2 stream.
                         var responseToCache = response.clone();
 
-                        getStorageKey(fetchRequest).then(function (key) {
-                            responseToCache.json().then(function (result) {
-                                localforage.setItem(key, result);
-                            });
+                        responseToCache.json().then(function (result) {
+                            localforage.setItem(storageKey, result[dataKey] || []);
                         });
 
                         return response;
@@ -93,24 +97,26 @@ var getStorageKey = function (request) {
     switch (url[4]) {
         case 'sp':
             name = url[6];
-            /*
-            if (request.method == 'POST') {
-                return request.formData().then(function (t) {
-                    if (t && t.params) {
-                        var date = t.params[0].value;
-                        name += "_" + date;
-                    }
-                    return name;
-                }).catch(function (err) {
-                    return Promise.resolve(name);
-                });
-            } else {
-                return Promise.resolve(name);
-            } */
-            return Promise.resolve(name);
+            return name;
         default:
             name = url[5];
-            return Promise.resolve(name);
+            return name;
     }
+};
 
+var getDataKey = function (request) {
+    var url = request.url.split('/');
+    switch (url[4]) {
+        case 'sp':
+            return 0;
+        default:
+            var name = url[5] || '';
+            var parts = name.split('?');
+            return parts[0];
+    }
+};
+
+var isSp = function (request) {
+    var url = request.url.split('/');
+    return url[4] === 'sp';
 };

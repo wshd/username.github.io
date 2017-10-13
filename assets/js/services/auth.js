@@ -1,41 +1,24 @@
-app.service('Auth', [ '$q', '$http', 'DreamFactory',
-    function ($q, $http, DreamFactory) {
-        var _login = function (user) {
-            var deffered = $q.defer();
-            if (DreamFactory.api.ready){
-                var callParams = {
-                    body: user
-                };
+app.service('Auth', [ '$q', '$http',
+    function ($q, $http) {
+        var _login = function(user) {
+            var url = 'https://mintfox.com.ua/api/api.php/';
 
-                DreamFactory.api.user.login(callParams,
-                    function (data) {
-                        $http.defaults.headers.common["X-DreamFactory-Session-Token"] = data.session_id;
-                        localforage.setItem('currentUser', data);
-                        deffered.resolve(data);
-                    },
-                    function (msg) {
-                        deffered.reject(msg);
-                    }
-                );
-            }
-            return deffered.promise;
+            return $http({
+                method: 'POST',
+                url: url,
+                data: $.param(user),
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+            }).then(function(r) {
+                var token = angular.fromJson(r.data);
+                $http.defaults.headers.common['X-XSRF-TOKEN'] = token;
+                return localforage.setItem('currentUser', token);
+            });
         };
 
         var _logout = function () {
-            var deffered = $q.defer();
-            if (DreamFactory.api.ready){
-                DreamFactory.api.user.logout( {},
-                    function (data) {
-                        delete $http.defaults.headers.common["X-DreamFactory-Session-Token"];
-                        localforage.removeItem('currentUser');
-                        deffered.resolve(data);
-                    },
-                    function (msg) {
-                        deffered.reject(msg);
-                    }
-                );
-            }
-            return deffered.promise;
+            delete $http.defaults.headers.common["X-XSRF-TOKEN"];
+            localforage.removeItem('currentUser');
+            return $q.when(true);
         };
 
         var _currentUser = function () {

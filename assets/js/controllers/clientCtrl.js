@@ -3,9 +3,6 @@ app.controller('ListClientCtrl', [ '$scope', '$http', '$modal', 'Storage', 'Noti
         var INSTANCE = 'client';
 
         $scope.isLoading = true;
-        $scope.$on('api:ready', function () {
-            reload();
-        });
 
         var dataTransform = function (data) {
             return data.map(function (o) {

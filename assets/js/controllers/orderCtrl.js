@@ -4,11 +4,8 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
 
         var orderLoading = true,
             regionLoading = true,
-            clientLoading = false; // TODO: apply later
+            clientLoading = true;
         $scope.isLoading = true;
-        $scope.$on('api:ready', function () {
-            reload();
-        });
         $scope.$on('regionchange', function(){
             FilterOrders();
         });
@@ -37,11 +34,9 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
 
         var reloadOrders = function () {
             if (window.navigator.onLine) {
-                var params = [{
-                    name: "sel_date",
-                    param_type: "date",
-                    value: $scope.app.selDate
-                }];
+                var params = {
+                    "sel_date": $scope.app.selDate
+                };
 
                 Storage.getSP_params('orders_by_date', params).then(function (data) {
                         applyOrders(data);
@@ -72,11 +67,9 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
 
         var reloadRegionsByDate = function () {
             if (window.navigator.onLine) {
-                var params = [{
-                    name: "sel_date",
-                    param_type: "date",
-                    value: $scope.app.selDate
-                }];
+                var params = {
+                    "sel_date": $scope.app.selDate
+                };
 
                 Storage.getSP_params('region_orders_by_date', params).then(function (data) {
                         applyRegionsByDate(data);
@@ -114,7 +107,7 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
 
 
         var reloadCachedOrders = function () {
-            localforage.getItem('orders_by_date_' + $scope.app.selDate).then(function (data) {
+            localforage.getItem('orders_by_date?' + $scope.app.selDate).then(function (data) {
                 applyOrders(data);
                 if (data != null) {
                     orderLoading = false;
@@ -125,14 +118,14 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
         };
 
         var reloadCachedRegions = function () {
-            localforage.getItem('region').then(function (data) {
+            localforage.getItem('region?transform=1').then(function (data) {
                 applyRegions(data);
                 reloadRegions();
             }).catch(function () { reloadRegions(); });
         };
 
         var reloadCachedRegionsByDate = function () {
-            localforage.getItem('region_orders_by_date_' + $scope.app.selDate).then(function (data) {
+            localforage.getItem('region_orders_by_date?' + $scope.app.selDate).then(function (data) {
                 applyRegionsByDate(data);
                 if (data != null) {
                     regionLoading = false;
@@ -421,9 +414,6 @@ app.controller('HistoryOrderCtrl', [ '$scope', '$state', '$filter', 'Storage', '
         };
 
         $scope.isLoading = true;
-        $scope.$on('api:ready', function () {
-            reload();
-        });
 
         var applyData = function (data) {
             drawChart(data);

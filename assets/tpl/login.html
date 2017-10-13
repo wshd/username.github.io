@@ -7,10 +7,10 @@
       </div>
       <div class="list-group list-group-sm box-shadow-lg">
         <div class="list-group-item">
-          <input type="email" placeholder="Email" class="form-control no-border" ng-model="user.email" required>
+          <input name="username" type="email" placeholder="Email" class="form-control no-border" ng-model="user.username" required>
         </div>
         <div class="list-group-item">
-           <input type="password" placeholder="Пароль" class="form-control no-border" ng-model="user.password" required>
+           <input name="password" type="password" placeholder="Пароль" class="form-control no-border" ng-model="user.password" required>
         </div>
       </div>
       <button type="submit" class="btn btn-info btn-lg btn-block" ng-click="login()" ng-disabled='form.$invalid'>Увійти</button>

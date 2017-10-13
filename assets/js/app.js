@@ -3,8 +3,7 @@ angular.module('app', [
     'ui.bootstrap',
     'ui-notification',
     'smart-table',
-    'googlechart',
-    'ngDreamFactory'
+    'googlechart'
 ]);
 
 
@@ -12,10 +11,8 @@ angular.module('app', [
 
 var app =
     angular.module('app')
-        .constant('DSP_URL', 'https://dream-wshd.rhcloud.com')
-        .constant('DSP_API_KEY', 'uagb')
-        .config(['$httpProvider', 'DSP_API_KEY', function($httpProvider, DSP_API_KEY) {
-            // $httpProvider.defaults.headers.common['X-DreamFactory-Application-Name'] = DSP_API_KEY;
+        .config(["$httpProvider", function ($httpProvider) {
+            $httpProvider.defaults.withCredentials = true;
         }])
         .config(
         [        '$controllerProvider', '$compileProvider', '$filterProvider', '$provide',

@@ -1,12 +1,13 @@
-app.service('DB', [ '$q', '$http',
+app.service('DB', [ '$http', '$state',
 
-    function ($q, $http) {
+    function ($http, $state) {
         var apiUrl = "https://mintfox.com.ua/api/api.php/";
         var apiSpUrl = "https://mintfox.com.ua/api/sp/api.php/";
         var suffix = "?transform=1"
 
         function handleError(e){
-            if (e.error.length > 0 && e.error[0].code == 403) {
+            if (e.status == 401) {
+                sessionStorage.setItem('stateToGo', sessionStorage.getItem('stateToGo') || $state.current.name);
                 window.location = '#/access/logout';
             }
         };
@@ -26,16 +27,12 @@ app.service('DB', [ '$q', '$http',
         };
 
         var _callStoredProcWithParams = function (spname, params) {
-            var url = apiSpUrl + spname + "?" + params[0].value;
-            var httpParams = {};        // TODO: send params in correct format
-            params.forEach(function(p){
-                httpParams[p.name] = p.value;
-            });
+            var url = apiSpUrl + spname + "?" + params.sel_date;
 
             return $http({
                 method: 'POST',
                 url: url,
-                data: $.param(httpParams),
+                data: $.param(params),
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'}
             }).then(function(r) {
                 return r.data[0] || [];
