@@ -7,12 +7,11 @@ angular.module('app', [
     'LocalForageModule'
 ]);
 
-
 // config
 
 var app =
     angular.module('app')
-        .constant('APP_VERSION', '1.0.5(13.10.2017)')
+        .constant('APP_VERSION', '1.0.6(14.10.2017)')
         .config(["$httpProvider", function ($httpProvider) {
             $httpProvider.defaults.withCredentials = true;
         }])
