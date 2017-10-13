@@ -3,8 +3,7 @@ angular.module('app', [
     'ui.bootstrap',
     'ui-notification',
     'smart-table',
-    'googlechart',
-    'ngDreamFactory'
+    'googlechart'
 ]);
 
 
@@ -12,10 +11,8 @@ angular.module('app', [
 
 var app =
     angular.module('app')
-        .constant('DSP_URL', 'https://dream-wshd.rhcloud.com')
-        .constant('DSP_API_KEY', 'uagb')
-        .config(['$httpProvider', 'DSP_API_KEY', function($httpProvider, DSP_API_KEY) {
-            // $httpProvider.defaults.headers.common['X-DreamFactory-Application-Name'] = DSP_API_KEY;
+        .config(["$httpProvider", function ($httpProvider) {
+            $httpProvider.defaults.withCredentials = true;
         }])
         .config(
         [        '$controllerProvider', '$compileProvider', '$filterProvider', '$provide',
@@ -38,16 +35,15 @@ var app =
  */
 angular.module('app')
   .run(
-    [          '$rootScope', '$state', '$stateParams', 'DreamFactory',
-      function ($rootScope,   $state,   $stateParams, DreamFactory) {
+    [          '$rootScope', '$state', '$stateParams',
+      function ($rootScope,   $state,   $stateParams) {
           $rootScope.$state = $state;
           $rootScope.$stateParams = $stateParams;
-          $rootScope.df = DreamFactory;
 
-          $rootScope.$on('$stateChangeError', function (e) {
+          $rootScope.$on('$stateChangeError', function (e, toState, toParams, fromState, fromParams, error) {
               e.preventDefault();
-              sessionStorage.setItem('stateToGo', '');
-              $state.go('access.login');
+              sessionStorage.setItem('stateToGo', toState.name);
+              $state.go('access.logout');
           });
       }
     ]
@@ -57,9 +53,10 @@ angular.module('app')
       function ($stateProvider,   $urlRouterProvider) {
 
           var authenticated = ['Auth', function (Auth) {
-              //if (!Auth.currentUser()) throw "User not authorized!";
-              //return true;
-              return Auth.currentUser();
+              return Auth.currentUser().then(function(user){
+                  if (!user) throw "User not authorized!";
+                  return user;
+              });
           }];
 
           $urlRouterProvider
@@ -732,7 +729,7 @@ angular.module('app')
             // config
             $scope.app = {
                 name: 'UA-GB',
-                version: '1.0.4(30.09.2017)',
+                version: '1.0.5(13.10.2017)',
                 // for chart colors
                 color: {
                     primary: '#7266ba',
@@ -848,9 +845,14 @@ app.controller('LoginCtrl', ['$scope', 'Auth',
             Auth.login($scope.user).then(function (data) {
                 var prevState = sessionStorage.getItem('stateToGo');
                 $scope.$state.go(prevState ? prevState : 'app.history');
+                sessionStorage.setItem('stateToGo', '');
             }, function (msg) {
                 console.log(msg);
-                $scope.authError = msg;
+                if (msg.status = 401) {
+                    $scope.authError = "Вхід не виконано. Перевірте правильність пароля та електронної пошти";
+                } else {
+                    $scope.authError = msg;
+                }
             });
         };
 
@@ -871,9 +873,6 @@ app.controller('ListClientCtrl', [ '$scope', '$http', '$modal', 'Storage', 'Noti
         var INSTANCE = 'client';
 
         $scope.isLoading = true;
-        $scope.$on('api:ready', function () {
-            reload();
-        });
 
         var dataTransform = function (data) {
             return data.map(function (o) {
@@ -1014,11 +1013,8 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
 
         var orderLoading = true,
             regionLoading = true,
-            clientLoading = false; // TODO: apply later
+            clientLoading = true;
         $scope.isLoading = true;
-        $scope.$on('api:ready', function () {
-            reload();
-        });
         $scope.$on('regionchange', function(){
             FilterOrders();
         });
@@ -1047,11 +1043,9 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
 
         var reloadOrders = function () {
             if (window.navigator.onLine) {
-                var params = [{
-                    name: "sel_date",
-                    param_type: "date",
-                    value: $scope.app.selDate
-                }];
+                var params = {
+                    "sel_date": $scope.app.selDate
+                };
 
                 Storage.getSP_params('orders_by_date', params).then(function (data) {
                         applyOrders(data);
@@ -1082,11 +1076,9 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
 
         var reloadRegionsByDate = function () {
             if (window.navigator.onLine) {
-                var params = [{
-                    name: "sel_date",
-                    param_type: "date",
-                    value: $scope.app.selDate
-                }];
+                var params = {
+                    "sel_date": $scope.app.selDate
+                };
 
                 Storage.getSP_params('region_orders_by_date', params).then(function (data) {
                         applyRegionsByDate(data);
@@ -1124,7 +1116,7 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
 
 
         var reloadCachedOrders = function () {
-            localforage.getItem('orders_by_date_' + $scope.app.selDate).then(function (data) {
+            localforage.getItem('orders_by_date?' + $scope.app.selDate).then(function (data) {
                 applyOrders(data);
                 if (data != null) {
                     orderLoading = false;
@@ -1135,14 +1127,14 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
         };
 
         var reloadCachedRegions = function () {
-            localforage.getItem('region').then(function (data) {
+            localforage.getItem('region?transform=1').then(function (data) {
                 applyRegions(data);
                 reloadRegions();
             }).catch(function () { reloadRegions(); });
         };
 
         var reloadCachedRegionsByDate = function () {
-            localforage.getItem('region_orders_by_date_' + $scope.app.selDate).then(function (data) {
+            localforage.getItem('region_orders_by_date?' + $scope.app.selDate).then(function (data) {
                 applyRegionsByDate(data);
                 if (data != null) {
                     regionLoading = false;
@@ -1431,9 +1423,6 @@ app.controller('HistoryOrderCtrl', [ '$scope', '$state', '$filter', 'Storage', '
         };
 
         $scope.isLoading = true;
-        $scope.$on('api:ready', function () {
-            reload();
-        });
 
         var applyData = function (data) {
             drawChart(data);
@@ -1517,9 +1506,6 @@ app.controller('RegionCtrl', ['$scope', '$modal', 'Storage', 'Notify',
         var INSTANCE = 'region';
 
         $scope.isLoading = true;
-        $scope.$on('api:ready', function () {
-            reload();
-        });
 
         var applyData = function (data) {
             $scope.regions = data;
@@ -2070,44 +2056,27 @@ angular.module('app')
       }
     };
   }]);
-app.service('Auth', [ '$q', '$http', 'DreamFactory',
-    function ($q, $http, DreamFactory) {
-        var _login = function (user) {
-            var deffered = $q.defer();
-            if (DreamFactory.api.ready){
-                var callParams = {
-                    body: user
-                };
+app.service('Auth', [ '$q', '$http',
+    function ($q, $http) {
+        var _login = function(user) {
+            var url = 'https://mintfox.com.ua/api/api.php/';
 
-                DreamFactory.api.user.login(callParams,
-                    function (data) {
-                        $http.defaults.headers.common["X-DreamFactory-Session-Token"] = data.session_id;
-                        localforage.setItem('currentUser', data);
-                        deffered.resolve(data);
-                    },
-                    function (msg) {
-                        deffered.reject(msg);
-                    }
-                );
-            }
-            return deffered.promise;
+            return $http({
+                method: 'POST',
+                url: url,
+                data: $.param(user),
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+            }).then(function(r) {
+                var token = angular.fromJson(r.data);
+                $http.defaults.headers.common['X-XSRF-TOKEN'] = token;
+                return localforage.setItem('currentUser', token);
+            });
         };
 
         var _logout = function () {
-            var deffered = $q.defer();
-            if (DreamFactory.api.ready){
-                DreamFactory.api.user.logout( {},
-                    function (data) {
-                        delete $http.defaults.headers.common["X-DreamFactory-Session-Token"];
-                        localforage.removeItem('currentUser');
-                        deffered.resolve(data);
-                    },
-                    function (msg) {
-                        deffered.reject(msg);
-                    }
-                );
-            }
-            return deffered.promise;
+            delete $http.defaults.headers.common["X-XSRF-TOKEN"];
+            localforage.removeItem('currentUser');
+            return $q.when(true);
         };
 
         var _currentUser = function () {
@@ -2126,15 +2095,16 @@ app.service('Auth', [ '$q', '$http', 'DreamFactory',
             }
         };
     }]);
-app.service('DB', [ '$q', '$http',
+app.service('DB', [ '$http', '$state',
 
-    function ($q, $http) {
+    function ($http, $state) {
         var apiUrl = "https://mintfox.com.ua/api/api.php/";
         var apiSpUrl = "https://mintfox.com.ua/api/sp/api.php/";
         var suffix = "?transform=1"
 
         function handleError(e){
-            if (e.error.length > 0 && e.error[0].code == 403) {
+            if (e.status == 401) {
+                sessionStorage.setItem('stateToGo', sessionStorage.getItem('stateToGo') || $state.current.name);
                 window.location = '#/access/logout';
             }
         };
@@ -2154,16 +2124,12 @@ app.service('DB', [ '$q', '$http',
         };
 
         var _callStoredProcWithParams = function (spname, params) {
-            var url = apiSpUrl + spname + "?" + params[0].value;
-            var httpParams = {};        // TODO: send params in correct format
-            params.forEach(function(p){
-                httpParams[p.name] = p.value;
-            });
+            var url = apiSpUrl + spname + "?" + params.sel_date;
 
             return $http({
                 method: 'POST',
                 url: url,
-                data: $.param(httpParams),
+                data: $.param(params),
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'}
             }).then(function(r) {
                 return r.data[0] || [];
@@ -2246,22 +2212,8 @@ app.service('Notify', [ 'Notification',
             }
         }
     }]);
-app.service('Storage', [ '$q', 'DB', '$http',  'Auth',
-    function ($q, db, $http, Auth) {
-
-        function handleError(e){
-            if (e.error.length > 0 && e.error[0].code == 403) {
-                window.location = '#/access/logout';
-            }
-        };
-
-        var checkAuth = function(){
-            Auth.currentUser().then(function (sessionUser) {
-                if (sessionUser && !$http.defaults.headers.common["X-DreamFactory-Session-Token"]) {
-                    $http.defaults.headers.common["X-DreamFactory-Session-Token"] = sessionUser.session_id;
-                }
-            });
-        };
+app.service('Storage', ['DB',
+    function (db) {
 
         var _get = function (table) {
             return db.getRecords(table);
@@ -2290,199 +2242,21 @@ app.service('Storage', [ '$q', 'DB', '$http',  'Auth',
 
         return {
             get: function (table) {
-                //checkAuth();
                 return _get(table);
             },
             getSP: function (spname) {
-                //checkAuth();
                 return _getSP(spname);
             },
             getSP_params: function (spname, params) {
-                //checkAuth();
                 return _getSP_params(spname, params);
             },
             insert: function (table, item) {
-                //checkAuth();
                 return _insert(table, item);
             },
             update: function (table, item) {
-                //checkAuth();
                 return _update(table, item);
             },
             delete: function (table, id) {
-                //checkAuth();
-                return _delete(table, id);
-            }
-        };
-    }]);
-app.service('OldStorage', [ '$q', 'DreamFactory', '$http',  'Auth',
-    function ($q, DreamFactory, $http, Auth) {
-
-        function handleError(e){
-            if (e.error.length > 0 && e.error[0].code == 403) {
-                window.location = '#/access/logout';
-            }
-        };
-
-        var checkAuth = function(){
-            Auth.currentUser().then(function (sessionUser) {
-                if (sessionUser && !$http.defaults.headers.common["X-DreamFactory-Session-Token"]) {
-                    $http.defaults.headers.common["X-DreamFactory-Session-Token"] = sessionUser.session_id;
-                }
-            });
-        };
-
-        var _get = function (table) {
-            var deffered = $q.defer();
-            if (DreamFactory.api.ready){
-                var callParams = {
-                    table_name: table
-                };
-
-                DreamFactory.api.uagb.getRecords(callParams,
-                    function (data) {
-                        deffered.resolve(data.record);
-                    },
-                    function (msg) {
-                        handleError(msg);
-                        deffered.reject(msg);
-                    }
-                );
-            }
-            return deffered.promise;
-        };
-
-        var _getSP = function (spname) {
-            var deffered = $q.defer();
-            if (DreamFactory.api.ready){
-                var callParams = {
-                    procedure_name: spname
-                };
-
-                DreamFactory.api.uagb.callStoredProc(callParams,
-                    function (data) {
-                        deffered.resolve(data);
-                    },
-                    function (msg) {
-                        handleError(msg);
-                        deffered.reject(msg);
-                    }
-                );
-            }
-            return deffered.promise;
-
-        };
-
-        var _getSP_params = function (spname, params) {
-            var deffered = $q.defer();
-            if (DreamFactory.api.ready){
-                var callParams = {
-                    procedure_name: spname,
-                    body: {
-                        params: params
-                    }
-                };
-
-                DreamFactory.api.uagb.callStoredProcWithParams(callParams,
-                    function (data) {
-                        deffered.resolve(data);
-                    },
-                    function (msg) {
-                        handleError(msg);
-                        deffered.reject(msg);
-                    }
-                );
-            }
-            return deffered.promise;
-
-        };
-
-        var _insert = function (table, item) {
-            var deffered = $q.defer();
-            if (DreamFactory.api.ready) {
-                var callParams = {
-                    table_name: table,
-                    body: item
-                };
-
-                DreamFactory.api.uagb.createRecords(callParams,
-                    function (data) {
-                        deffered.resolve(data);
-                    },
-                    function (msg) {
-                        handleError(msg);
-                        deffered.reject(msg);
-                    }
-                );
-            }
-            return deffered.promise;
-        };
-
-        var _update = function (table, item) {
-            var deffered = $q.defer();
-            if (DreamFactory.api.ready) {
-                var callParams = {
-                    table_name: table,
-                    body: [item]
-                };
-
-                DreamFactory.api.uagb.updateRecords(callParams,
-                    function (data) {
-                        deffered.resolve(data);
-                    },
-                    function (msg) {
-                        handleError(msg);
-                        deffered.reject(msg);
-                    }
-                );
-            }
-            return deffered.promise;
-        };
-
-        var _delete = function (table, id) {
-            var deffered = $q.defer();
-            if (DreamFactory.api.ready) {
-                var callParams = {
-                    table_name: table,
-                    ids: id
-                };
-
-                DreamFactory.api.uagb.deleteRecordsByIds(callParams,
-                    function (data) {
-                        deffered.resolve(data);
-                    },
-                    function (msg) {
-                        handleError(msg);
-                        deffered.reject(msg);
-                    }
-                );
-            }
-            return deffered.promise;
-        };
-
-        return {
-            get: function (table) {
-                checkAuth();
-                return _get(table);
-            },
-            getSP: function (spname) {
-                checkAuth();
-                return _getSP(spname);
-            },
-            getSP_params: function (spname, params) {
-                checkAuth();
-                return _getSP_params(spname, params);
-            },
-            insert: function (table, item) {
-                checkAuth();
-                return _insert(table, item);
-            },
-            update: function (table, item) {
-                checkAuth();
-                return _update(table, item);
-            },
-            delete: function (table, id) {
-                checkAuth();
                 return _delete(table, id);
             }
         };
