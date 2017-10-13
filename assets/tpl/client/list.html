@@ -1,11 +1,11 @@
 <div class="bg-light lter b-b wrapper-md" ng-init="app.settings.asideHide = true">
-    <a class="pull-right btn btn-sm btn-success" href ng-click="add()"><i class="glyphicon glyphicon-plus"></i></a>
+    <a class="pull-right btn btn-sm btn-success" ng-class="{'disabled': !app.isOnline}" href ng-click="add()"><i class="glyphicon glyphicon-plus"></i></a>
     <h1 class="m-n font-thin h3"><i class="icon-users fa-fw"></i> &nbsp; Клієнти</h1>
 </div>
 <div class="wrapper-md" st-table="displayClients" st-safe-src="clients">
     <div class="row">
         <div class="m-sm">
-            <div class="panel panel-info">
+            <div class="panel {{app.isOnline ? 'panel-info' : 'panel-default'}}">
                 <div class="panel-heading wrapper-md">
                     <div class="input-group">
                         <input st-search=""  class="form-control" placeholder="Пошук..." type="search"/>
@@ -20,7 +20,7 @@
             <div class="panel panel-default">
                 <div class="table-responsive" ng-show="clients.length > 0">
                     <table class="table table-condensed b-light">
-                        <thead class="bg-info text-white">
+                        <thead class="text-white" ng-class="app.themeColor">
                         <tr>
                             <th st-sort="name">П.І.П.</th>
                             <th st-sort="phone"><i class="icon-call-end fa-fw"></i></th>
@@ -39,8 +39,8 @@
                             <td>{{client.orders_int}}</td>
                             <td class="commands">
                                 <div class="btn-group btn-group-nowrap" role="group">
-                                    <button href ng-click="edit(client)" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-pencil"></i></button>
-                                    <button ng-click="delete(client)" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-trash"></i></button>
+                                    <button href ng-click="edit(client)" class="btn btn-default btn-sm" ng-class="{'disabled': !app.isOnline}"><i class="glyphicon glyphicon-pencil"></i></button>
+                                    <button ng-click="delete(client)" class="btn btn-danger btn-sm" ng-class="{'disabled': !app.isOnline}"><i class="glyphicon glyphicon-trash"></i></button>
                                 </div>
                             </td>
                         </tr>

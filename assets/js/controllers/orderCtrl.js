@@ -1,5 +1,5 @@
-app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Notify',
-    function ($scope, $filter, $modal, Storage, Notify) {
+app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Notify', '$localForage',
+    function ($scope, $filter, $modal, Storage, Notify, $localForage) {
         var INSTANCE = 'order';
 
         var orderLoading = true,
@@ -33,7 +33,7 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
         };
 
         var reloadOrders = function () {
-            if (window.navigator.onLine) {
+            if ($scope.isOnline()) {
                 var params = {
                     "sel_date": $scope.app.selDate
                 };
@@ -56,7 +56,7 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
         };
 
         var reloadRegions = function () {
-            if (window.navigator.onLine) {
+            if ($scope.isOnline()) {
                 Storage.get('region').then(function (data) {
                     applyRegions(data);
                 }, function (msg) {
@@ -66,7 +66,7 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
         };
 
         var reloadRegionsByDate = function () {
-            if (window.navigator.onLine) {
+            if ($scope.isOnline()) {
                 var params = {
                     "sel_date": $scope.app.selDate
                 };
@@ -89,7 +89,7 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
         };
 
         var reloadClients = function () {
-            if (window.navigator.onLine) {
+            if ($scope.isOnline()) {
                 Storage.getSP('clients_with_totals').then(function (data) {
                     applyClients(data);
                     clientLoading = false;
@@ -107,7 +107,7 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
 
 
         var reloadCachedOrders = function () {
-            localforage.getItem('orders_by_date?' + $scope.app.selDate).then(function (data) {
+            $localForage.getItem('orders_by_date?' + $scope.app.selDate).then(function (data) {
                 applyOrders(data);
                 if (data != null) {
                     orderLoading = false;
@@ -118,14 +118,14 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
         };
 
         var reloadCachedRegions = function () {
-            localforage.getItem('region?transform=1').then(function (data) {
+            $localForage.getItem('region?transform=1').then(function (data) {
                 applyRegions(data);
                 reloadRegions();
             }).catch(function () { reloadRegions(); });
         };
 
         var reloadCachedRegionsByDate = function () {
-            localforage.getItem('region_orders_by_date?' + $scope.app.selDate).then(function (data) {
+            $localForage.getItem('region_orders_by_date?' + $scope.app.selDate).then(function (data) {
                 applyRegionsByDate(data);
                 if (data != null) {
                     regionLoading = false;
@@ -136,7 +136,7 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
         };
 
         var reloadCachedClients = function () {
-            localforage.getItem('clients_with_totals').then(function (data) {
+            $localForage.getItem('clients_with_totals').then(function (data) {
                 applyClients(data);
                 if (data != null) {
                     clientLoading = false;
@@ -404,8 +404,8 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
 
     }]);
 
-app.controller('HistoryOrderCtrl', [ '$scope', '$state', '$filter', 'Storage', 'Notify',
-    function ($scope, $state, $filter, Storage, Notify) {
+app.controller('HistoryOrderCtrl', [ '$scope', '$state', '$filter', 'Storage', 'Notify', '$localForage',
+    function ($scope, $state, $filter, Storage, Notify, $localForage) {
         var today = {
             date: $filter('date')(new Date(), 'yyyy-MM-dd'),
             isToday: true,
@@ -426,7 +426,7 @@ app.controller('HistoryOrderCtrl', [ '$scope', '$state', '$filter', 'Storage', '
         };
 
         var reload = function () {
-            if (window.navigator.onLine) {
+            if ($scope.isOnline()) {
                 Storage.getSP('order_history').then(function (data) {
                     applyData(data);
                     $scope.isLoading = false;
@@ -441,7 +441,7 @@ app.controller('HistoryOrderCtrl', [ '$scope', '$state', '$filter', 'Storage', '
         };
 
         var reloadFromCache = function () {
-            localforage.getItem('order_history').then(function (data) {
+            $localForage.getItem('order_history').then(function (data) {
                 applyData(data);
                 if (data != null) {
                     $scope.isLoading = false;

@@ -3,7 +3,8 @@ angular.module('app', [
     'ui.bootstrap',
     'ui-notification',
     'smart-table',
-    'googlechart'
+    'googlechart',
+    'LocalForageModule'
 ]);
 
 
@@ -11,8 +12,15 @@ angular.module('app', [
 
 var app =
     angular.module('app')
+        .constant('APP_VERSION', '1.0.5(13.10.2017)')
         .config(["$httpProvider", function ($httpProvider) {
             $httpProvider.defaults.withCredentials = true;
+        }])
+        .config(["$localForageProvider", "APP_VERSION", function($localForageProvider, APP_VERSION) {
+            $localForageProvider.config({
+                name        : 'UA-GB',
+                storeName   : 'UA-GB_' + APP_VERSION
+            });
         }])
         .config(
         [        '$controllerProvider', '$compileProvider', '$filterProvider', '$provide',

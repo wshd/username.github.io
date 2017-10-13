@@ -1,6 +1,7 @@
 importScripts("/lib/localforage.min.js");
 
-var CACHE_NAME = 'ua-gb-cache-v1';
+var APP_VERSION = '1.0.5(13.10.2017)';
+var CACHE_NAME = 'ua-gb-cache-v' + APP_VERSION;
 var urlsToCache = [
     '/',
     '/assets/tpl/app.html',
@@ -18,10 +19,11 @@ var urlsToCache = [
     '/dist/js/vendor.js',
     '/lib/localforage.min.js',
     '/dist/img/bg.jpg',
-    '/dist/fonts/fontawesome-webfont.eot',
-    '/dist/fonts/fontawesome-webfont.svg',
-    '/dist/fonts/fontawesome-webfont.ttf',
-    '/dist/fonts/fontawesome-webfont.woff',
+    '/dist/fonts/fontawesome-webfont.eot?v=4.2.0',
+    '/dist/fonts/fontawesome-webfont.eot?#iefix&v=4.2.0',
+    '/dist/fonts/fontawesome-webfont.svg?v=4.2.0#fontawesomeregular',
+    '/dist/fonts/fontawesome-webfont.ttf?v=4.2.0',
+    '/dist/fonts/fontawesome-webfont.woff?v=4.2.0',
     '/dist/fonts/FontAwesome.otf',
     '/dist/fonts/glyphicons-halflings-regular.eot',
     '/dist/fonts/glyphicons-halflings-regular.svg',
@@ -37,6 +39,10 @@ var urlsToCache = [
     '/dist/fonts/sourcesanspro/sourcesanspro.woff'
 ];
 
+localforage.config({
+    name        : 'UA-GB',
+    storeName   : 'UA-GB_' + APP_VERSION
+});
 
 self.addEventListener('install', function(event) {
     event.waitUntil(
@@ -84,7 +90,10 @@ self.addEventListener('fetch', function(event) {
 
                         return response;
                     }
-                );
+                )
+                    .catch(function (error) {
+                        console.log(error);
+                    });
             })
     );
 });

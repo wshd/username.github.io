@@ -1,5 +1,5 @@
-app.service('Auth', [ '$q', '$http',
-    function ($q, $http) {
+app.service('Auth', [ '$q', '$http', '$localForage',
+    function ($q, $http, $localForage) {
         var _login = function(user) {
             var url = 'https://mintfox.com.ua/api/api.php/';
 
@@ -11,18 +11,18 @@ app.service('Auth', [ '$q', '$http',
             }).then(function(r) {
                 var token = angular.fromJson(r.data);
                 $http.defaults.headers.common['X-XSRF-TOKEN'] = token;
-                return localforage.setItem('currentUser', token);
+                return $localForage.setItem('currentUser', token);
             });
         };
 
         var _logout = function () {
             delete $http.defaults.headers.common["X-XSRF-TOKEN"];
-            localforage.removeItem('currentUser');
+            $localForage.removeItem('currentUser');
             return $q.when(true);
         };
 
         var _currentUser = function () {
-            return localforage.getItem('currentUser');
+            return $localForage.getItem('currentUser');
         };
 
         return {

@@ -3,7 +3,8 @@ angular.module('app', [
     'ui.bootstrap',
     'ui-notification',
     'smart-table',
-    'googlechart'
+    'googlechart',
+    'LocalForageModule'
 ]);
 
 
@@ -11,8 +12,15 @@ angular.module('app', [
 
 var app =
     angular.module('app')
+        .constant('APP_VERSION', '1.0.5(13.10.2017)')
         .config(["$httpProvider", function ($httpProvider) {
             $httpProvider.defaults.withCredentials = true;
+        }])
+        .config(["$localForageProvider", "APP_VERSION", function($localForageProvider, APP_VERSION) {
+            $localForageProvider.config({
+                name        : 'UA-GB',
+                storeName   : 'UA-GB_' + APP_VERSION
+            });
         }])
         .config(
         [        '$controllerProvider', '$compileProvider', '$filterProvider', '$provide',
@@ -717,8 +725,8 @@ angular.module('app')
 /* Controllers */
 
 angular.module('app')
-    .controller('AppCtrl', ['$scope', '$window',    '$filter',  '$state',  'Notification',
-        function(              $scope,   $window,   $filter,    $state,    Notification  ) {
+    .controller('AppCtrl', ['$scope', '$window',    '$filter',  '$state',  'Notification', 'APP_VERSION',
+        function(              $scope,   $window,   $filter,    $state,    Notification,  APP_VERSION ) {
             // add 'ie' classes to html
             var isIE = !!navigator.userAgent.match(/MSIE/i);
             isIE && angular.element($window.document.body).addClass('ie');
@@ -729,7 +737,7 @@ angular.module('app')
             // config
             $scope.app = {
                 name: 'UA-GB',
-                version: '1.0.5(13.10.2017)',
+                version: APP_VERSION,
                 // for chart colors
                 color: {
                     primary: '#7266ba',
@@ -758,7 +766,9 @@ angular.module('app')
                 showCharts: true,
                 selDate: $filter('date')(new Date(), 'yyyy-MM-dd'),
                 regions: [],
-                selRegion: {}
+                selRegion: {},
+                themeColor: "bg-info",
+                isOnline: true
             };
 
             $scope.SelectedRegionId = function () {
@@ -782,6 +792,22 @@ angular.module('app')
 
             $scope.toggleCharts = function () {
                 $scope.app.showCharts = !$scope.app.showCharts;
+            };
+
+            $scope.isOnline = function() {
+                var onlineColor = "bg-info";
+                var offlineColor = "bg-black";
+
+                var wasOnline = $scope.app.isOnline;
+                $scope.app.isOnline = window.navigator.onLine;
+                $scope.app.themeColor = $scope.app.isOnline ? onlineColor : offlineColor;
+                if (wasOnline != $scope.app.isOnline) {
+                    // notify user about going online/offline
+                    // alert("You're now " + $scope.app.isOnline ? "online" : "offline");
+                    $scope.app.settings.navbarCollapseColor =
+                        $scope.app.settings.navbarHeaderColor = $scope.app.themeColor + " dker";
+                }
+                return $scope.app.isOnline;
             };
 
             // save settings to local storage
@@ -868,8 +894,8 @@ app.controller('LogoutCtrl', ['$scope', 'Auth',
             console.log(msg);
         });
     }]);
-app.controller('ListClientCtrl', [ '$scope', '$http', '$modal', 'Storage', 'Notify',
-    function ($scope, $http, $modal, Storage, Notify) {
+app.controller('ListClientCtrl', [ '$scope', '$http', '$modal', 'Storage', 'Notify', '$localForage',
+    function ($scope, $http, $modal, Storage, Notify, $localForage) {
         var INSTANCE = 'client';
 
         $scope.isLoading = true;
@@ -886,7 +912,8 @@ app.controller('ListClientCtrl', [ '$scope', '$http', '$modal', 'Storage', 'Noti
         };
 
         var reload = function () {
-            Storage.getSP('clients_with_totals').then(function (data) {
+            if ($scope.isOnline()) {
+                Storage.getSP('clients_with_totals').then(function (data) {
                     applyData(data);
                     $scope.isLoading = false;
                 },
@@ -895,15 +922,18 @@ app.controller('ListClientCtrl', [ '$scope', '$http', '$modal', 'Storage', 'Noti
                     showError('list', null);
                     $scope.isLoading = false;
                 });
-            Storage.get('region').then(function (data) {
+                Storage.get('region').then(function (data) {
                     $scope.regions = data;
                 }, function (msg) {
                     console.log('Regions loading failed. ' + msg);
                 });
+            } else {
+                $scope.isLoading = false;
+            }
         };
 
         var reloadFromCache = function () {
-            localforage.getItem('clients_with_totals').then(function (data) {
+            $localForage.getItem('clients_with_totals').then(function (data) {
                 applyData(data);
                 if (data != null) {
                     $scope.isLoading = false;
@@ -1007,8 +1037,8 @@ app.controller('ListClientCtrl', [ '$scope', '$http', '$modal', 'Storage', 'Noti
         };
 
 }]);
-app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Notify',
-    function ($scope, $filter, $modal, Storage, Notify) {
+app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Notify', '$localForage',
+    function ($scope, $filter, $modal, Storage, Notify, $localForage) {
         var INSTANCE = 'order';
 
         var orderLoading = true,
@@ -1042,7 +1072,7 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
         };
 
         var reloadOrders = function () {
-            if (window.navigator.onLine) {
+            if ($scope.isOnline()) {
                 var params = {
                     "sel_date": $scope.app.selDate
                 };
@@ -1065,7 +1095,7 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
         };
 
         var reloadRegions = function () {
-            if (window.navigator.onLine) {
+            if ($scope.isOnline()) {
                 Storage.get('region').then(function (data) {
                     applyRegions(data);
                 }, function (msg) {
@@ -1075,7 +1105,7 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
         };
 
         var reloadRegionsByDate = function () {
-            if (window.navigator.onLine) {
+            if ($scope.isOnline()) {
                 var params = {
                     "sel_date": $scope.app.selDate
                 };
@@ -1098,7 +1128,7 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
         };
 
         var reloadClients = function () {
-            if (window.navigator.onLine) {
+            if ($scope.isOnline()) {
                 Storage.getSP('clients_with_totals').then(function (data) {
                     applyClients(data);
                     clientLoading = false;
@@ -1116,7 +1146,7 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
 
 
         var reloadCachedOrders = function () {
-            localforage.getItem('orders_by_date?' + $scope.app.selDate).then(function (data) {
+            $localForage.getItem('orders_by_date?' + $scope.app.selDate).then(function (data) {
                 applyOrders(data);
                 if (data != null) {
                     orderLoading = false;
@@ -1127,14 +1157,14 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
         };
 
         var reloadCachedRegions = function () {
-            localforage.getItem('region?transform=1').then(function (data) {
+            $localForage.getItem('region?transform=1').then(function (data) {
                 applyRegions(data);
                 reloadRegions();
             }).catch(function () { reloadRegions(); });
         };
 
         var reloadCachedRegionsByDate = function () {
-            localforage.getItem('region_orders_by_date?' + $scope.app.selDate).then(function (data) {
+            $localForage.getItem('region_orders_by_date?' + $scope.app.selDate).then(function (data) {
                 applyRegionsByDate(data);
                 if (data != null) {
                     regionLoading = false;
@@ -1145,7 +1175,7 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
         };
 
         var reloadCachedClients = function () {
-            localforage.getItem('clients_with_totals').then(function (data) {
+            $localForage.getItem('clients_with_totals').then(function (data) {
                 applyClients(data);
                 if (data != null) {
                     clientLoading = false;
@@ -1413,8 +1443,8 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
 
     }]);
 
-app.controller('HistoryOrderCtrl', [ '$scope', '$state', '$filter', 'Storage', 'Notify',
-    function ($scope, $state, $filter, Storage, Notify) {
+app.controller('HistoryOrderCtrl', [ '$scope', '$state', '$filter', 'Storage', 'Notify', '$localForage',
+    function ($scope, $state, $filter, Storage, Notify, $localForage) {
         var today = {
             date: $filter('date')(new Date(), 'yyyy-MM-dd'),
             isToday: true,
@@ -1435,7 +1465,7 @@ app.controller('HistoryOrderCtrl', [ '$scope', '$state', '$filter', 'Storage', '
         };
 
         var reload = function () {
-            if (window.navigator.onLine) {
+            if ($scope.isOnline()) {
                 Storage.getSP('order_history').then(function (data) {
                     applyData(data);
                     $scope.isLoading = false;
@@ -1450,7 +1480,7 @@ app.controller('HistoryOrderCtrl', [ '$scope', '$state', '$filter', 'Storage', '
         };
 
         var reloadFromCache = function () {
-            localforage.getItem('order_history').then(function (data) {
+            $localForage.getItem('order_history').then(function (data) {
                 applyData(data);
                 if (data != null) {
                     $scope.isLoading = false;
@@ -1501,8 +1531,8 @@ app.controller('HistoryOrderCtrl', [ '$scope', '$state', '$filter', 'Storage', '
         };
     }]);
 
-app.controller('RegionCtrl', ['$scope', '$modal', 'Storage', 'Notify',
-    function ($scope, $modal, Storage, Notify) {
+app.controller('RegionCtrl', ['$scope', '$modal', 'Storage', 'Notify', '$localForage',
+    function ($scope, $modal, Storage, Notify, $localForage) {
         var INSTANCE = 'region';
 
         $scope.isLoading = true;
@@ -1512,19 +1542,23 @@ app.controller('RegionCtrl', ['$scope', '$modal', 'Storage', 'Notify',
         };
 
         var reload = function () {
-            Storage.getSP('regions_with_totals').then(function (data) {
-                    applyData(data);
-                    $scope.isLoading = false;
-                },
-                function (msg) {
-                    console.log('Regions loading failed. ' + msg);
-                    showError('list', null);
-                    $scope.isLoading = false;
-                });
+            if ($scope.isOnline()) {
+                Storage.getSP('regions_with_totals').then(function (data) {
+                        applyData(data);
+                        $scope.isLoading = false;
+                    },
+                    function (msg) {
+                        console.log('Regions loading failed. ' + msg);
+                        showError('list', null);
+                        $scope.isLoading = false;
+                    });
+            } else {
+                $scope.isLoading = false;
+            }
         };
 
         var reloadFromCache = function () {
-            localforage.getItem('regions_with_totals').then(function (data) {
+            $localForage.getItem('regions_with_totals').then(function (data) {
                 applyData(data);
                 if (data != null) {
                     $scope.isLoading = false;
@@ -2056,8 +2090,8 @@ angular.module('app')
       }
     };
   }]);
-app.service('Auth', [ '$q', '$http',
-    function ($q, $http) {
+app.service('Auth', [ '$q', '$http', '$localForage',
+    function ($q, $http, $localForage) {
         var _login = function(user) {
             var url = 'https://mintfox.com.ua/api/api.php/';
 
@@ -2069,18 +2103,18 @@ app.service('Auth', [ '$q', '$http',
             }).then(function(r) {
                 var token = angular.fromJson(r.data);
                 $http.defaults.headers.common['X-XSRF-TOKEN'] = token;
-                return localforage.setItem('currentUser', token);
+                return $localForage.setItem('currentUser', token);
             });
         };
 
         var _logout = function () {
             delete $http.defaults.headers.common["X-XSRF-TOKEN"];
-            localforage.removeItem('currentUser');
+            $localForage.removeItem('currentUser');
             return $q.when(true);
         };
 
         var _currentUser = function () {
-            return localforage.getItem('currentUser');
+            return $localForage.getItem('currentUser');
         };
 
         return {

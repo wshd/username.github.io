@@ -6,7 +6,7 @@
     <div class="row">
         <div class="m-sm">
             <div class="panel panel-default hidden-print">
-                <div class="panel-heading bg-info lt wrapper-sm">
+                <div class="panel-heading lt wrapper-sm" ng-class="app.themeColor">
                     <button type="button" class="btn btn-default btn-xs pull-right" ng-click="toggleCharts()"><i class="glyphicon glyphicon-stats"></i></button>
                     <span class="h4 text-white">Статистика</span>
                 </div>
@@ -19,11 +19,11 @@
     <div class="row">
         <div class="m-sm">
             <div class="panel panel-default">
-                <div class="panel-heading bg-info dk wrapper-sm">
+                <div class="panel-heading dk wrapper-sm" ng-class="app.themeColor">
                     <div class="m-sm">
                         <span class="pull-right h3 text-info-dker visible-print">{{app.selDate}}</span>
                         <div class="btn-group btn-group-sm pull-right hidden-print">
-                            <button type="button" class="btn btn-success" ng-click="add()"><i class="glyphicon glyphicon-plus"></i></button>
+                            <button type="button" class="btn btn-success" ng-click="add()" ng-class="{'disabled': !app.isOnline}"><i class="glyphicon glyphicon-plus"></i></button>
                             <button type="button" class="btn btn-dark" ng-click="print()"><i class="glyphicon glyphicon-print"></i></button>
                             <!--<button type="button" class="btn btn-primary" ng-click="fix()"><i class="glyphicon glyphicon-exclamation-sign"></i></button>-->
                         </div>
@@ -33,7 +33,7 @@
                 </div>
                 <div class="hidden-print" ng-show="filteredOrders.length > 0 && !isLoading">
                     <table st-table="displayOrders" st-safe-src="filteredOrders" class="table table-condensed b-light">
-                        <thead class="bg-info text-white">
+                        <thead class="text-white" ng-class="app.themeColor">
                         <tr>
                             <th>#</th>
                             <th class="hidden-xs hidden-sm"><i class="icon-home fa-fw"></i></th>
@@ -76,8 +76,8 @@
                             <td class="hidden-xs hidden-sm">{{order.comment}}</td>
                             <td class="commands">
                                 <div class="btn-group btn-group-nowrap" role="group">
-                                    <button href ng-click="edit(order)" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-pencil"></i></button>
-                                    <button ng-click="delete(order)" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-trash"></i></button>
+                                    <button href ng-click="edit(order)" class="btn btn-default btn-sm" ng-class="{'disabled': !app.isOnline}"><i class="glyphicon glyphicon-pencil"></i></button>
+                                    <button ng-click="delete(order)" class="btn btn-danger btn-sm" ng-class="{'disabled': !app.isOnline}"><i class="glyphicon glyphicon-trash"></i></button>
                                 </div>
                             </td>
                         </tr>

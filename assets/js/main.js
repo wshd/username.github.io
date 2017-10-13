@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('app')
-    .controller('AppCtrl', ['$scope', '$window',    '$filter',  '$state',  'Notification',
-        function(              $scope,   $window,   $filter,    $state,    Notification  ) {
+    .controller('AppCtrl', ['$scope', '$window',    '$filter',  '$state',  'Notification', 'APP_VERSION',
+        function(              $scope,   $window,   $filter,    $state,    Notification,  APP_VERSION ) {
             // add 'ie' classes to html
             var isIE = !!navigator.userAgent.match(/MSIE/i);
             isIE && angular.element($window.document.body).addClass('ie');
@@ -15,7 +15,7 @@ angular.module('app')
             // config
             $scope.app = {
                 name: 'UA-GB',
-                version: '1.0.5(13.10.2017)',
+                version: APP_VERSION,
                 // for chart colors
                 color: {
                     primary: '#7266ba',
@@ -44,7 +44,9 @@ angular.module('app')
                 showCharts: true,
                 selDate: $filter('date')(new Date(), 'yyyy-MM-dd'),
                 regions: [],
-                selRegion: {}
+                selRegion: {},
+                themeColor: "bg-info",
+                isOnline: true
             };
 
             $scope.SelectedRegionId = function () {
@@ -68,6 +70,22 @@ angular.module('app')
 
             $scope.toggleCharts = function () {
                 $scope.app.showCharts = !$scope.app.showCharts;
+            };
+
+            $scope.isOnline = function() {
+                var onlineColor = "bg-info";
+                var offlineColor = "bg-black";
+
+                var wasOnline = $scope.app.isOnline;
+                $scope.app.isOnline = window.navigator.onLine;
+                $scope.app.themeColor = $scope.app.isOnline ? onlineColor : offlineColor;
+                if (wasOnline != $scope.app.isOnline) {
+                    // notify user about going online/offline
+                    // alert("You're now " + $scope.app.isOnline ? "online" : "offline");
+                    $scope.app.settings.navbarCollapseColor =
+                        $scope.app.settings.navbarHeaderColor = $scope.app.themeColor + " dker";
+                }
+                return $scope.app.isOnline;
             };
 
             // save settings to local storage

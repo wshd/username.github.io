@@ -5,7 +5,7 @@
     <div class="row">
         <div class="m-sm">
             <div class="panel panel-default hidden-print">
-                <div class="panel-heading bg-info lt wrapper-sm">
+                <div class="panel-heading lt wrapper-sm" ng-class="app.themeColor">
                     <button type="button" class="btn btn-default btn-xs pull-right" ng-click="toggleCharts()"><i class="glyphicon glyphicon-stats"></i></button>
                     <span class="h4 text-white">Статистика</span>
                 </div>
@@ -20,7 +20,7 @@
             <div class="panel panel-default">
                 <div class="table-responsive" ng-show="dates.length > 0">
                     <table st-table="displayDates" st-safe-src="dates" class="table table-condensed b-light">
-                        <thead class="bg-info text-white">
+                        <thead class="text-white" ng-class="app.themeColor">
                         <tr>
                             <th>ДАТА</th>
                             <th><i class="icon-present fa-fw"></i></th>

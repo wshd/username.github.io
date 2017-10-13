@@ -1,5 +1,5 @@
-app.controller('RegionCtrl', ['$scope', '$modal', 'Storage', 'Notify',
-    function ($scope, $modal, Storage, Notify) {
+app.controller('RegionCtrl', ['$scope', '$modal', 'Storage', 'Notify', '$localForage',
+    function ($scope, $modal, Storage, Notify, $localForage) {
         var INSTANCE = 'region';
 
         $scope.isLoading = true;
@@ -9,19 +9,23 @@ app.controller('RegionCtrl', ['$scope', '$modal', 'Storage', 'Notify',
         };
 
         var reload = function () {
-            Storage.getSP('regions_with_totals').then(function (data) {
-                    applyData(data);
-                    $scope.isLoading = false;
-                },
-                function (msg) {
-                    console.log('Regions loading failed. ' + msg);
-                    showError('list', null);
-                    $scope.isLoading = false;
-                });
+            if ($scope.isOnline()) {
+                Storage.getSP('regions_with_totals').then(function (data) {
+                        applyData(data);
+                        $scope.isLoading = false;
+                    },
+                    function (msg) {
+                        console.log('Regions loading failed. ' + msg);
+                        showError('list', null);
+                        $scope.isLoading = false;
+                    });
+            } else {
+                $scope.isLoading = false;
+            }
         };
 
         var reloadFromCache = function () {
-            localforage.getItem('regions_with_totals').then(function (data) {
+            $localForage.getItem('regions_with_totals').then(function (data) {
                 applyData(data);
                 if (data != null) {
                     $scope.isLoading = false;

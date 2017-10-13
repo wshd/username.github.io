@@ -1,5 +1,5 @@
 <div class="bg-light lter b-b wrapper-md" ng-init="app.settings.asideHide = true">
-    <a class="pull-right btn btn-sm btn-success" href ng-click="add()"><i class="glyphicon glyphicon-plus"></i></a>
+    <a class="pull-right btn btn-sm btn-success" ng-class="{'disabled': !app.isOnline}" href ng-click="add()"><i class="glyphicon glyphicon-plus"></i></a>
     <h1 class="m-n font-thin h3"><i class="icon-directions fa-fw"></i> &nbsp; Регіони</h1>
 </div>
 <div class="wrapper-md">
@@ -8,7 +8,7 @@
             <div class="panel panel-default">
                 <div class="table-responsive" ng-show="regions.length > 0">
                     <table st-table="displayRegions" st-safe-src="regions" class="table table-condensed b-light">
-                        <thead class="bg-info text-white">
+                        <thead class="text-white" ng-class="app.themeColor">
                         <tr>
                             <th>НАЗВА</th>
                             <th><i class="icon-present fa-fw"></i></th>
@@ -23,8 +23,8 @@
                             <td>{{region.clients}}</td>
                             <td class="commands">
                                 <div class="btn-group btn-group-nowrap" role="group">
-                                    <button href ng-click="edit(region)" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-pencil"></i></button>
-                                    <button ng-click="delete(region)" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-trash"></i></button>
+                                    <button href ng-click="edit(region)" class="btn btn-default btn-sm" ng-class="{'disabled': !app.isOnline}"><i class="glyphicon glyphicon-pencil"></i></button>
+                                    <button ng-click="delete(region)" class="btn btn-danger btn-sm" ng-class="{'disabled': !app.isOnline}"><i class="glyphicon glyphicon-trash"></i></button>
                                 </div>
                             </td>
                         </tr>

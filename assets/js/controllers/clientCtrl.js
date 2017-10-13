@@ -1,5 +1,5 @@
-app.controller('ListClientCtrl', [ '$scope', '$http', '$modal', 'Storage', 'Notify',
-    function ($scope, $http, $modal, Storage, Notify) {
+app.controller('ListClientCtrl', [ '$scope', '$http', '$modal', 'Storage', 'Notify', '$localForage',
+    function ($scope, $http, $modal, Storage, Notify, $localForage) {
         var INSTANCE = 'client';
 
         $scope.isLoading = true;
@@ -16,7 +16,8 @@ app.controller('ListClientCtrl', [ '$scope', '$http', '$modal', 'Storage', 'Noti
         };
 
         var reload = function () {
-            Storage.getSP('clients_with_totals').then(function (data) {
+            if ($scope.isOnline()) {
+                Storage.getSP('clients_with_totals').then(function (data) {
                     applyData(data);
                     $scope.isLoading = false;
                 },
@@ -25,15 +26,18 @@ app.controller('ListClientCtrl', [ '$scope', '$http', '$modal', 'Storage', 'Noti
                     showError('list', null);
                     $scope.isLoading = false;
                 });
-            Storage.get('region').then(function (data) {
+                Storage.get('region').then(function (data) {
                     $scope.regions = data;
                 }, function (msg) {
                     console.log('Regions loading failed. ' + msg);
                 });
+            } else {
+                $scope.isLoading = false;
+            }
         };
 
         var reloadFromCache = function () {
-            localforage.getItem('clients_with_totals').then(function (data) {
+            $localForage.getItem('clients_with_totals').then(function (data) {
                 applyData(data);
                 if (data != null) {
                     $scope.isLoading = false;
