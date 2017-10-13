@@ -3,14 +3,16 @@
 /* Controllers */
 
 angular.module('app')
-    .controller('AppCtrl', ['$scope', '$window',    '$filter',  '$state',  'Notification', 'APP_VERSION',
-        function(              $scope,   $window,   $filter,    $state,    Notification,  APP_VERSION ) {
+    .controller('AppCtrl', ['$scope', '$window',    '$filter',  '$state',  'Notification', 'APP_VERSION', '$localForage', "$http",
+        function(              $scope,   $window,   $filter,    $state,    Notification,  APP_VERSION, $localForage, $http) {
             // add 'ie' classes to html
             var isIE = !!navigator.userAgent.match(/MSIE/i);
             isIE && angular.element($window.document.body).addClass('ie');
             isSmartDevice( $window ) && angular.element($window.document.body).addClass('smart');
             registerSW();
-
+            $localForage.getItem('currentUser').then(function (token) {
+                $http.defaults.headers.common['X-XSRF-TOKEN'] = token;
+            });
 
             // config
             $scope.app = {
