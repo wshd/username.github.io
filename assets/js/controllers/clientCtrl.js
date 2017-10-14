@@ -5,6 +5,7 @@ app.controller('ListClientCtrl', [ '$scope', '$http', '$modal', 'Storage', 'Noti
         $scope.isLoading = true;
 
         var dataTransform = function (data) {
+            data = data || [];
             return data.map(function (o) {
                 o.orders_int = parseInt(o.orders);
                 return o;

@@ -417,10 +417,10 @@ app.controller('HistoryOrderCtrl', [ '$scope', '$state', '$filter', 'Storage', '
 
         var applyData = function (data) {
             drawChart(data);
-            if (data[0].date == today.date){
+            if (data && data.length && data[0].date == today.date){
                 data[0].isToday = true;
-            }else{
-                data = [ today].concat(data);
+            } else {
+                data = [today].concat(data);
             }
             $scope.dates = data;
         };

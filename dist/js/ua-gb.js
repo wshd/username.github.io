@@ -902,6 +902,7 @@ app.controller('ListClientCtrl', [ '$scope', '$http', '$modal', 'Storage', 'Noti
         $scope.isLoading = true;
 
         var dataTransform = function (data) {
+            data = data || [];
             return data.map(function (o) {
                 o.orders_int = parseInt(o.orders);
                 return o;
@@ -1457,10 +1458,10 @@ app.controller('HistoryOrderCtrl', [ '$scope', '$state', '$filter', 'Storage', '
 
         var applyData = function (data) {
             drawChart(data);
-            if (data[0].date == today.date){
+            if (data && data.length && data[0].date == today.date){
                 data[0].isToday = true;
-            }else{
-                data = [ today].concat(data);
+            } else {
+                data = [today].concat(data);
             }
             $scope.dates = data;
         };
