@@ -7,10 +7,10 @@
       </div>
       <div class="list-group list-group-sm box-shadow-lg">
         <div class="list-group-item">
-          <input name="username" type="email" placeholder="Email" class="form-control no-border" ng-model="user.username" required>
+          <input name="username" type="email" placeholder="Email" class="form-control no-border" ng-model="user.username" autocomplete="off" required>
         </div>
         <div class="list-group-item">
-           <input name="password" type="password" placeholder="Пароль" class="form-control no-border" ng-model="user.password" required>
+           <input name="password" type="password" placeholder="Пароль" class="form-control no-border" ng-model="user.password" autocomplete="off" required>
         </div>
       </div>
       <button type="submit" class="btn btn-info btn-lg btn-block" ng-click="login()">Увійти</button>
