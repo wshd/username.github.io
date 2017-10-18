@@ -11,7 +11,7 @@ angular.module('app', [
 
 var app =
     angular.module('app')
-        .constant('APP_VERSION', '1.0.6(14.10.2017)')
+        .constant('APP_VERSION', '1.0.7(17.10.2017)')
         .config(["$httpProvider", function ($httpProvider) {
             $httpProvider.defaults.withCredentials = true;
         }])

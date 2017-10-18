@@ -35,14 +35,14 @@
                     <table st-table="displayOrders" st-safe-src="filteredOrders" class="table table-condensed b-light">
                         <thead class="text-white" ng-class="app.themeColor">
                         <tr>
-                            <th>#</th>
-                            <th class="hidden-xs hidden-sm"><i class="icon-home fa-fw"></i></th>
-                            <th ng-hide="(app.selRegion || {}).id"><i class="icon-direction fa-fw"></i></th>
-                            <th><i class="icon-user fa-fw"></i></th>
-                            <th class="hidden-xs hidden-sm"><i class="icon-call-end fa-fw"></i></th>
-                            <th><i class="icon-bag fa-fw"></i></th>
-                            <th class="hidden-xs hidden-sm"><i class="icon-speedometer fa-fw"></i></th>
-                            <th class="hidden-xs hidden-sm"><i class="icon-doc fa-fw"></i></th>
+                            <th st-sort="number_int">#</th>
+                            <th st-sort="address" class="hidden-xs hidden-sm"><i class="icon-home fa-fw"></i></th>
+                            <th st-sort="region" ng-hide="(app.selRegion || {}).id"><i class="icon-direction fa-fw"></i></th>
+                            <th st-sort="client_name"><i class="icon-user fa-fw"></i></th>
+                            <th st-sort="client_phone" class="hidden-xs hidden-sm"><i class="icon-call-end fa-fw"></i></th>
+                            <th st-sort="bags_amount"><i class="icon-bag fa-fw"></i></th>
+                            <th st-sort="weight_int" class="hidden-xs hidden-sm"><i class="icon-speedometer fa-fw"></i></th>
+                            <th st-sort="comment" class="hidden-xs hidden-sm"><i class="icon-doc fa-fw"></i></th>
                             <th>&nbsp;</th>
                         </tr>
                         </thead>

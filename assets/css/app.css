@@ -5230,6 +5230,10 @@ a.text-#000000:hover {
 
 
 /* app specific */
+th[st-sort] {
+  cursor: pointer;
+}
+
 .bags .bag,
 .goods .good {
     margin-right: 0.6em;

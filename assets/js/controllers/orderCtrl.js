@@ -14,6 +14,9 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
             angular.forEach(data, function (v, k) {
                 v._bags = angular.fromJson(v.bags);
                 v._goods = angular.fromJson(v.goods);
+                v.number_int = parseInt(v.number);
+                v.weight_int = parseInt(v.weight);
+                v.bags_amount = v._bags.length;
             });
             $scope.orders = data;
             FilterOrders();
@@ -305,7 +308,7 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
                     function (data) {
                         reload();
                         Notify.success(_ENTITY, ACTION, item.name, 'Клієнта було успішно додано!');
-                        item.id = data.id;
+                        item.id = data;
                         $scope.orderToEdit.selected_client = item;
                         $scope.client_selected(item);
                     }, function (msg) {

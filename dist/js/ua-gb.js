@@ -11,7 +11,7 @@ angular.module('app', [
 
 var app =
     angular.module('app')
-        .constant('APP_VERSION', '1.0.6(14.10.2017)')
+        .constant('APP_VERSION', '1.0.7(17.10.2017)')
         .config(["$httpProvider", function ($httpProvider) {
             $httpProvider.defaults.withCredentials = true;
         }])
@@ -1055,6 +1055,9 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
             angular.forEach(data, function (v, k) {
                 v._bags = angular.fromJson(v.bags);
                 v._goods = angular.fromJson(v.goods);
+                v.number_int = parseInt(v.number);
+                v.weight_int = parseInt(v.weight);
+                v.bags_amount = v._bags.length;
             });
             $scope.orders = data;
             FilterOrders();
@@ -1346,7 +1349,7 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
                     function (data) {
                         reload();
                         Notify.success(_ENTITY, ACTION, item.name, 'Клієнта було успішно додано!');
-                        item.id = data.id;
+                        item.id = data;
                         $scope.orderToEdit.selected_client = item;
                         $scope.client_selected(item);
                     }, function (msg) {
@@ -2143,6 +2146,11 @@ app.service('DB', [ '$http', '$state',
                 sessionStorage.setItem('stateToGo', sessionStorage.getItem('stateToGo') || $state.current.name);
                 window.location = '#/access/logout';
             }
+            throw e;
+        };
+
+        var _pickData = function(result) {
+            return result.data;
         };
 
         var _getRecords = function (table) {
@@ -2174,7 +2182,7 @@ app.service('DB', [ '$http', '$state',
 
         function _createRecords(table, item) {
             var url = apiUrl + table;
-            return $http.post(url, item).catch(handleError);
+            return $http.post(url, item).then(_pickData).catch(handleError);
         };
 
         function _updateRecords(table, item) {

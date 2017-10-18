@@ -10,6 +10,11 @@ app.service('DB', [ '$http', '$state',
                 sessionStorage.setItem('stateToGo', sessionStorage.getItem('stateToGo') || $state.current.name);
                 window.location = '#/access/logout';
             }
+            throw e;
+        };
+
+        var _pickData = function(result) {
+            return result.data;
         };
 
         var _getRecords = function (table) {
@@ -41,7 +46,7 @@ app.service('DB', [ '$http', '$state',
 
         function _createRecords(table, item) {
             var url = apiUrl + table;
-            return $http.post(url, item).catch(handleError);
+            return $http.post(url, item).then(_pickData).catch(handleError);
         };
 
         function _updateRecords(table, item) {

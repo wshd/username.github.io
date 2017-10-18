@@ -1,6 +1,6 @@
 importScripts("/lib/localforage.min.js");
 
-var APP_VERSION = '1.0.6(14.10.2017)';
+var APP_VERSION = '1.0.7(17.10.2017)';
 var CACHE_NAME = 'ua-gb-cache-v' + APP_VERSION;
 var urlsToCache = [
     '/',
