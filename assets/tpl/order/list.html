@@ -32,10 +32,13 @@
                     </div>
                 </div>
                 <div class="hidden-print" ng-show="filteredOrders.length > 0 && !isLoading">
-                    <table st-table="displayOrders" st-safe-src="filteredOrders" class="table table-condensed b-light">
+                    <table st-table="displayOrders"
+                           st-safe-src="filteredOrders"
+                           st-pipe="sorted"
+                           class="table table-condensed b-light">
                         <thead class="text-white" ng-class="app.themeColor">
                         <tr>
-                            <th st-sort="number_int">#</th>
+                            <th st-sort="number_int" st-sort-default="true">#</th>
                             <th st-sort="address" class="hidden-xs hidden-sm"><i class="icon-home fa-fw"></i></th>
                             <th st-sort="region" ng-hide="(app.selRegion || {}).id"><i class="icon-direction fa-fw"></i></th>
                             <th st-sort="client_name"><i class="icon-user fa-fw"></i></th>
@@ -47,7 +50,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr ng-repeat="order in displayOrders">
+                        <tr ng-repeat="order in displayOrders track by order.id">
                             <td>{{order.number}}</td>
                             <td class="hidden-xs hidden-sm">{{order.address}}</td>
                             <td ng-hide="(app.selRegion || {}).id">{{order.region}}</td>
@@ -92,13 +95,12 @@
                     </table>
                 </div>
                 <div class="table-bordered visible-print" ng-show="filteredOrders.length > 0">
-                    <table class="table table-condensed b-t b-dark">
+                    <table st-table="filteredOrders" class="table table-condensed b-t b-dark">
                         <thead>
                         <tr>
                             <th>#</th>
-                            <th>Адреса</th>
+                            <th>П.І.П., Адреса</th>
                             <th ng-hide="(app.selRegion || {}).id">Регіон</th>
-                            <th>П.І.П.</th>
                             <th>Телефон</th>
                             <th>Передачі</th>
                             <th>Вага</th>
@@ -106,11 +108,13 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr ng-repeat="order in filteredOrders">
+                        <tr ng-repeat="order in filteredOrders track by order.id">
                             <td>{{order.number}}</td>
-                            <td>{{order.address}}</td>
+                            <td>
+                                <div><strong class="text-uppercase">{{order.client_name}}</strong></div>
+                                <div>{{order.address}}</div>
+                            </td>
                             <td ng-hide="(app.selRegion || {}).id">{{order.region}}</td>
-                            <td>{{order.client_name}}</td>
                             <td>{{order.client_phone}}</td>
                             <td class="bags">
                                 <div ng-show="order._bags.length > 0">

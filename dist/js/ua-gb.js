@@ -1046,6 +1046,7 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
         var orderLoading = true,
             regionLoading = true,
             clientLoading = true;
+            lastTableState = {};
         $scope.isLoading = true;
         $scope.$on('regionchange', function(){
             FilterOrders();
@@ -1217,6 +1218,7 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
             $scope.regionName = ($scope.app.selRegion || {}).name || "Всі";
             $scope.regionOrders = ($scope.app.selRegion || {}).order_amount || CountTotalOrders();
             $scope.regionWeight = ($scope.app.selRegion || {}).order_total_weight || CountTotalWeight();
+            $scope.sorted(lastTableState);
         };
 
         var CountTotalOrders = function () {
@@ -1258,6 +1260,19 @@ app.controller('ListOrderCtrl', [ '$scope', '$filter', '$modal', 'Storage', 'Not
                 'chartArea': {'left': '150', 'right': '15', 'top': '10', 'width': '100%', 'height': '80%'},
                 'legend': {'position': 'bottom'}
             };
+        };
+
+        $scope.sorted = function (tableState) {
+            if ($scope.filteredOrders) {
+                var predicate = tableState.sort.predicate || "number_int";
+                var start = tableState.pagination.start || 0;
+                var number = $scope.app.settings.itemsPerPage;
+                var reverse = tableState.sort.reverse;
+                $scope.filteredOrders = $filter('orderBy')($scope.filteredOrders, predicate, reverse);
+                tableState.pagination.numberOfPages = Math.ceil($scope.filteredOrders.length / number);
+                $scope.displayOrders = $scope.filteredOrders.slice(start, start + number);
+            }
+            lastTableState = tableState;
         };
 
         var showError = function (action, name) {

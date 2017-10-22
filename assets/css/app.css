@@ -5318,7 +5318,14 @@ select.form-control option {
     }
 }
 
+
+@page {
+  size: 21cm 29cm;
+  padding: 1.5cm;
+}
+
 @media print {
+
     .app-header-fixed {
         padding-top: 0 !important;
     }
@@ -5331,6 +5338,14 @@ select.form-control option {
     .bg-info .text-muted{
         color: #666666 !important;
     }
+    .panel,
+    .table {
+        margin-bottom: 0;
+    }
+    .st-sort-ascent:before,
+    .st-sort-descent:before {
+        display: none;
+    }
     .table > thead > tr > th {
         padding: 4px 8px;
         border-bottom: 1px solid #eaeff0;
@@ -5338,6 +5353,9 @@ select.form-control option {
     .table > tbody > tr > td, .table > tfoot > tr > td {
         padding: 4px 8px;
         border-top: 1px solid #eaeff0;
+    }
+    .label.bg-info {
+        background-color: #eeeeee !important;
     }
     .badge.up.right {
         right: 0 !important;
