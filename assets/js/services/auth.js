@@ -1,7 +1,7 @@
 app.service('Auth', [ '$q', '$http', '$localForage',
     function ($q, $http, $localForage) {
         var _login = function(user) {
-            var url = 'https://mintfox.com.ua/api/api.php/';
+            var url = 'https://masiki.toys/api/api.php/';
 
             return $http({
                 method: 'POST',
