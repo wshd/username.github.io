@@ -1,8 +1,10 @@
 app.service('DB', [ '$http', '$state',
 
     function ($http, $state) {
-        var apiUrl = "https://mintfox.com.ua/api/api.php/";
-        var apiSpUrl = "https://mintfox.com.ua/api/sp/api.php/";
+        var apiUrl = "https://masiki.toys/api/api.php/";
+        var apiSpUrl = "https://masiki.toys/api/sp/api.php/";
+        // var apiUrl = "https://mintfox.com.ua/api/api.php/";
+        // var apiSpUrl = "https://mintfox.com.ua/api/sp/api.php/";
         var suffix = "?transform=1"
 
         function handleError(e){

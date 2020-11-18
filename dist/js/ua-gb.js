@@ -11,7 +11,7 @@ angular.module('app', [
 
 var app =
     angular.module('app')
-        .constant('APP_VERSION', '1.0.7(17.10.2017)')
+        .constant('APP_VERSION', '1.0.7(18.11.2020)')
         .config(["$httpProvider", function ($httpProvider) {
             $httpProvider.defaults.withCredentials = true;
         }])
@@ -2152,8 +2152,10 @@ app.service('Auth', [ '$q', '$http', '$localForage',
 app.service('DB', [ '$http', '$state',
 
     function ($http, $state) {
-        var apiUrl = "https://mintfox.com.ua/api/api.php/";
-        var apiSpUrl = "https://mintfox.com.ua/api/sp/api.php/";
+        var apiUrl = "https://masiki.toys/api/api.php/";
+        var apiSpUrl = "https://masiki.toys/api/sp/api.php/";
+        // var apiUrl = "https://mintfox.com.ua/api/api.php/";
+        // var apiSpUrl = "https://mintfox.com.ua/api/sp/api.php/";
         var suffix = "?transform=1"
 
         function handleError(e){
